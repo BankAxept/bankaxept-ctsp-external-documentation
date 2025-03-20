@@ -15,7 +15,7 @@
 CTSP (Cloud Token Service Provider) is a Tokenization and Life Cycle Management (LCM) system delivered by BankAxept.
 The intention of this documentation is to describe message exchanges
 
-## Setting up your CTSO integration
+## Setting up your CTSP integration
 
 Each integration with the BankAxept CTSP platform will be unique, but there are some common steps that you will need to
 follow to get started. You can read about the setup process in the [Onboarding](./onboarding.md) guide.

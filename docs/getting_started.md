@@ -23,3 +23,5 @@ follow to get started. You can read about the setup process in the [Onboarding](
 Message exchange must follow the ISO8583 standard.
 
 ## Integration Guidelines
+
+Every integration is a cooperation that expects continous communication between BankAxept CTSP and the integrator.

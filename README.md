@@ -5,7 +5,7 @@ External documentation for the Cloud Token Service Provider team.
 
 This repository is also used to generate the publicly hosted documentation for the DES API. The documentation is written in Markdown and is generated using
 MkDocs.
-The documentation is found in the `docs` directory. The documentation is generated and published to GitHub Pages at [https://desdoc.bankaxept.no](https://desdoc.bankaxept.no).
+The documentation is found in the `docs` directory. The documentation is generated and published to GitHub Pages at [https://bankaxept.github.io/bankaxept-ctsp-external-documentation/](https://bankaxept.github.io/bankaxept-ctsp-external-documentation/).
 
 Mkdocs installation instructions can be found [here](https://www.mkdocs.org/user-guide/installation/).
 

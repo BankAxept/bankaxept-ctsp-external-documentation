@@ -2,7 +2,7 @@ const swaggerUrls = {
     "swagger-ctsp-token-api": {
         name: "BankAxept CTSP integrator API",
         // replace the url with the raw one when the API is public
-        url: "todo"
+        url: "https://raw.githubusercontent.com/BankAxept/bankaxept-ctsp-external-documentation/refs/heads/main/openapi/ctsp-web-service-interface/ctsp-token-api.yaml"
     }
 }
 

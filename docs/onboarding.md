@@ -1,36 +1,40 @@
 # Onboarding
 
-This page describes all steps required to start utilzing BankAxept CTSP. It includes a checklist of all necessary steps and requirements.
-As well as a description of why they are required
+This page describes all steps required to start utilizing Cloud TSP APIs. It includes a checklist of all necessary steps
+and requirements. As well as a description of why they are required
 
-## Step by Step Guide
+There are two environments available: preproduction and production. The preproduction environment is used for testing
+and development purposes, while the production environment is used for live transactions. Our support team can provide
+more detailed log information and assistance in the preproduction environment. During the initial integration, one or more
+security features can be disabled to ease the integration process. This is done on a case-by-case basis and must be
+agreed upon with BankAxept.
 
-1. Lorem
-2. Ipsum
-3. Support MTLs, see the [Connectivity](#Connectivity) section for more information.
+Connectivity is completed, the APIs are ready to be used. If the ISO-API is used, a set of MAC keys needs to be
+exchanged between the integrator and BankAxept. The MAC keys are used to ensure message integrity and authenticity in
+the messages exchanged.
 
-### Connectivity
+## Connectivity activities
 
-All communication with CTSP and the remote host (Acquirer Server or Bank Server) must be secured and support Mutual TLS.
+For each of the supported environments (preproduction and production) the following activities must be completed:
 
-#### VPN
-A VPN (IPSEC) coul be used with TLS Server Authentication but not recommended option
+1. Submit source IP address to BankAxept
+2. Create certificate signing request 
+3. Connectivity test
 
-#### mTLS Authentication (HTTPS)
+### Source IP address
 
-The TLS shall be used to get end-to-end encryption.
-If VPN is used, TLS shall be TLS server authentication otherwise TLS mutual authentication.
+The source IP address, or addresses, is used to allow the integrator's IP address in the BankAxept firewall. Any changes
+in the source IP needs to be communicated to BankAxept.
 
-The full ISO payload will be exchanged using HTTP Request/Response scheme:
-* HTTP Request
-  * initiated by the remote host
-  * method POST
-  * content type: “x-www-form-urlencoded”
-  * The full full byte array ISO message request is Base64 encoded and present in the Body Request
-* HTTP Response
-  * It contains the synchronous ISO message Response from Cloud TSP.
-  * The full byte array ISO message response is Base64 encoded in present in the Body Response.
-  * HTTP Status code
-    * 200 if Cloud TSP decodes and parses the ISO message Request. Response will contain the ISO message Response
-    * 4xx if Cloud TSP fails to decode and parse ISO message. No ISO message will be present.
-    * 5xx connection error. No ISO message will be present.
+### Certificate signing request
+
+A certificate signing request (CSR) needs to be provided to the Cloud TSP support team. Once the CSR is received, the
+support team will generate a certificate. This will be used to enable secure connectivity to the APIs.
+
+### Connectivity test
+
+The connectivity test is used to verify that the connectivity between the integrator and BankAxept is working as
+expected. The test is performed by the integrator with support by the Cloud TSP support team. A HTTP request, from
+the same source IPs as the ip that was added to the allow list, is sent to the health check endpoint provided by
+
+By verifying that the health check can be called successfully, the connectivity is considered to be working.

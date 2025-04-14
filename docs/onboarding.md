@@ -34,8 +34,7 @@ support team will generate a certificate. This will be used to enable secure con
 ### Connectivity test
 
 The connectivity test is used to verify that the connectivity between the integrator and BankAxept is working as
-expected. The test is performed by the integrator with support by the Cloud TSP support team. A HTTP request, from
-the same source IPs as the IP that was added to the allow list, is sent to the health check endpoint provided by
+expected. The test is performed by the integrator with support by the Cloud TSP support team. An HTTP request, from
 BankAxept. The health check endpoint URL is: `https://api.bankaxept.com/health-check`.
 
 By verifying that the health check can be called successfully, the connectivity is considered to be working.

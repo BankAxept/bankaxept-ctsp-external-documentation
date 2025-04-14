@@ -1,7 +1,7 @@
 # Onboarding
 
 This page describes all steps required to start utilizing Cloud TSP APIs. It includes a checklist of all necessary steps
-and requirements. As well as a description of why they are required
+and requirements, as well as a description of why they are required.
 
 There are two environments available: preproduction and production. The preproduction environment is used for testing
 and development purposes, while the production environment is used for live transactions. Our support team can provide

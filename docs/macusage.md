@@ -44,7 +44,7 @@ Currently there is support for 5 key interchange alternatives
 KI (Key Interchange) is the encrypted key used to encrypt the ephemeral MAC Key
 KI shall be exchanged between the parties during the setup phase.
 KI are exchanged encrypted under ZMK and shall be protected by HSM.
-KI is identifed by a key index (1 to 255) and allow Key Interchange switchover (key renewal)
+KI is identified by a key index (1 to 255) and allow Key Interchange switchover (key renewal)
 Key index is present in ISO Message in field 48, subfield 001.
 
 When using 3DES keys, the KI and ZMK must be 3DES keys of equal or better strength

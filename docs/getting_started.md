@@ -13,7 +13,7 @@
 # Introduction
 
 STØ Token Service, a SaaS TSP (Token Service Provider), offers fast, secure and reliable Tokenization including Life Cycle Management (LCM), detokenization and notification.
-This documentation describes the connectivity, message exchanges and cryptograpy required to use the service.
+This documentation describes the connectivity, message exchanges and cryptography required to use the service.
 
 ## Setting up your CTSP integration
 

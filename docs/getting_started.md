@@ -2,8 +2,7 @@
 <img alt="BankAxept_Logo.svg" src="../assets/images/bankaxept_logo.svg" width="300"/>
 </p>
 
-> Welcome to the Getting Started guide for the STØ
-> Token Service.
+> Welcome to the Getting Started guide for the STØ Token Service.
 >
 > This text is intended to give both clear descriptions and
 > guidance for integrators and consumers of CTSP. It includes an

@@ -65,11 +65,11 @@ Note: SHA-256 hash is used by default. SHA-1 hash can be used under request.
 
 ## Keys type and algorithms – 3DES
 
-|                  |                                                                                                                                                                                                                                                 |
-|------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| KI Key Type      | "3 key" 3DES (size 24 bytes) or "2 key" 3DES (size 16 bytes) (*)                                                                                                                                                                                |
-| MAC Key Type     | "2 key" 3DES (size 16 bytes)                                                                                                                                                                                                                    |
-| MAC Key wrapping | 3DES using CBC or ECB                                                                                                                                                                                                                           |
+|                  |                                                                                                                                                                                                                                                |
+|------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| KI Key Type      | "3 key" 3DES (size 24 bytes) or "2 key" 3DES (size 16 bytes) (*)                                                                                                                                                                               |
+| MAC Key Type     | "2 key" 3DES (size 16 bytes)                                                                                                                                                                                                                   |
+| MAC Key wrapping | 3DES using ECB                                                                                                                                                                                                                           |
 | MAC              | MAC Algorithm 3 (ISO 9797-1 Algorithm 3). Padding method 1 is used: input data is completed with `0`s until the data reaches a multiple of 8-byte blocks. No `0` is added if already a multiple. The MAC is the 8 leftmost bytes of the output. |
 
 (*) KI Key length depends to remote Host capability

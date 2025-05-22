@@ -1,5 +1,5 @@
 <p align="center">
-<img alt="BankAxept_Logo.svg" src="../assets/images/bankaxept_logo.svg" width="300"/>
+<img alt="BankAxept_Logo.svg" src="../assets/images/sto-primary.png" width="300"/>
 </p>
 
 > Welcome to the Getting Started guide for the BankAxept

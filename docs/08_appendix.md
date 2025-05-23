@@ -1,0 +1,231 @@
+# Appendix
+
+## Token Assurance Method codification
+
+The values are defined in the document: “Token Authorization Response” message in the ‘EMV Payment Tokenisation
+Specification Technical Framework v2.0”.
+
+| Token Assurance Method Category | Description                                                             |
+|---------------------------------|-------------------------------------------------------------------------|
+| Spaces                          | No Value Set                                                            |
+| **01 – 19**                     | **Common method categories**                                            |
+| 00                              | ID&V Not Performed                                                      |
+| 01                              | Non-Card Issuer Interactive Cardholder Authentication - 1 Factor        |
+| 02                              | Non-Card Issuer Interactive Cardholder Authentication - 2 Factor        |
+| 03                              | Non-Card Issuer Risk Oriented Non-Interactive Cardholder Authentication |
+| 04 - 09                         | Reserved for future EMVCo use                                           |
+| 10                              | Card Issuer Account Verification                                        |
+| 11                              | Card Issuer Interactive Cardholder Authentication - 1 Factor            |
+| 12                              | Card Issuer Interactive Cardholder Authentication - 2 Factor            |
+| 13                              | Card Issuer Risk Oriented Non-Interactive Cardholder Authentication     |
+| 14                              | Card Issuer Asserted Authentication                                     |
+| 15 - 19                         | Reserved for future EMVCo use                                           |
+| **20 - 89**                     | **Token Programme Specific**                                            |
+| **99 - 99**                     | **Reserved for future EMVCo use**                                       |
+
+## Storage Type
+
+Attributes of the device that may be used to identify the specific device where a Payment Token is stored.
+
+| Storage Type | Description                         |
+|--------------|-------------------------------------|
+| 01           | Device memory                       |
+| 02           | Device memory protected by TPM      |
+| 03           | Server                              |
+| 04           | TEE                                 |
+| 05           | SE                                  |
+| 06           | Virtual execution environment (VEE) |
+
+## Connectivity Requirements
+
+A secure channel must be established between the Cloud TSP and the remote Host (Acquirer server  or Bank server) as described below.
+
+### VPN
+
+A VPN (IPSEC) coul be used with TLS Server Authentication but not recommended option
+
+### TLS Authentication (HTTPS)
+
+The TLS shall be used to get end-to-end encryption.
+If VPN is used, TLS shall be TLS server authentication otherwise TLS mutual authentication.
+
+The full ISO payload will be exchanged using HTTP Request/Response scheme:
+
+* HTTP Request
+  * initiated by the remote host
+  * method POST
+  * content type: “x-www-form-urlencoded”
+  * The full full byte array ISO message request is Base64 encoded and present in the Body Request
+* HTTP Response
+  * It contains the synchronous ISO message Response from Cloud TSP.
+  * The full byte array ISO message response is Base64 encoded in present in the Body Response.
+  * HTTP Status code
+    * 200 if Cloud TSP decodes and parses the ISO message Request. Response will contain the ISO message Response
+    * 4xx if Cloud TSP fails to decode and parse ISO message. No ISO message will be present.
+    * 5xx connection error. No ISO message will be present.
+
+### MAC usage
+
+Usage of MAC is required in all ISO Message (Request and Response). See MAC details
+
+## MAC details
+
+The following principles shall be applied:
+* All ISO messages are protected using a MAC.
+* A new MAC key is generated for each ISO Message.
+* The MAC key is protected using a Encryption key (Key Interchange)
+* Key Interchange will be exchanged between each party encrypted under a ZMK
+* The ZMK (Zone Master Key) are exchanged during a key ceremony and imported into HSM.
+
+## Key Interchange
+
+KI (Key Interchange) is the encrypted key used to encrypt the ephemeral MAC Key
+KI shall be exchanged between the parties during the setup phase.
+KI are exchanged encrypted under ZMK and shall be protected by HSM.
+KI is identifed by a key index (1 to 255) and allow Key Interchange switchover (key renewal)
+Key index is present in ISO Message in Field n° 48 – Additional data, private (Identifier "001", the encrypted key index)
+
+### MAC key
+
+A MAC key shall be present in each ISO message, encrypted under KI in Field n° 48 – Additional data, private (Identifier "002", the MAC key)
+
+The MAC key is an ephemeral key to be generated by each party and could be reuse in several ISO Messages.
+
+The maximum lifetime recommendation for an ephemeral MAC key is 1 hour.
+
+### MAC
+
+MAC shall be computed for each ISO Message.
+MAC is present in Field n° 64 – Message Authentication Code
+Input data of the MAC is SHA-256 hash of the full ISO payload encoded to bytes excluding the mac value field (Field 64).
+**Note:** SHA-256 hash is used by default. SHA-1 hash can be used under request.
+
+### Keys type and algorithms
+
+|                  |                                                                                                                                                                                                                                                                                    |
+|------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| KI Key Type      | "3 key" 3DES (size 24 bytes) <br/> or "2" 3DES (size 16 bytes) (*)                                                                                                                                                                                                                 |
+| MAC Key Type     | "2 key" 3DES (size 16 bytes)                                                                                                                                                                                                                                                       |
+| MAC Key wrapping | 3DES using CBC or ECB                                                                                                                                                                                                                                                              |
+| MAC              | MAC Algorithm 3 (ISO 9797-1 Algorithm 3). Padding method 1 is used: input data is completed with `0`s until the data reaches a multiple of 8-byte blocks. No `0` is added if the input is already a multiple of 8-byte blocks. <br/> The MAC is the 8 leftmost bytes of the output |
+(*) KI Key length depends to remote Host capability
+
+## Healthcheck interface
+
+A healthcheck mechanism allow testing on a regular basis the peer to peer connectivity. On HTTP  request to dedicated URL, HTTP 200 is returned by TSP while the status is up and running.
+
+Both HTTP POST and GET method can be invoked.
+
+URL is formatted as below:
+
+    URL: https://<domain name>/gtotx/api/iso/healthCheck
+
+## ISO interface
+
+ISO message are carried over HTTP.
+
+HTTP POST method can be invoked.
+
+URL is formatted as below:
+
+    URL: https:// <domain name>/gtotx/api/iso/v10/msg
+
+## ISO8583 request/response examples
+
+### Detokenization Request:
+
+```
+----BEGIN ISO MESSAGE-----
+MTI : 1100
+BitMap : {2, 3, 4, 7, 14, 18, 19, 22, 23, 37, 42, 43, 48, 49, 55, 64}
+Field-2 : [603200*******1961]               (PAN - PRIMARY ACCOUNT NUMBER)
+Field-3 : [000000]                          (PROCESSING CODE)
+Field-4 : [000000002100]                    (AMOUNT, TRANSACTION)
+Field-7 : [1017684135]                      (TRANSMISSION DATE AND TIME)
+Field-14 : [2809]                           (DATE, EXPIRATION)
+Field-18 : [1520]                           (MERCHANTS TYPE)
+Field-19 : [250]                            (ACQUIRING INSTITUTION COUNTRY CODE)
+Field-22 : [000]                            (POINT OF SERVICE ENTRY MODE)
+Field-23 : [000]                            (CARD SEQUENCE NUMBER)
+Field-37 : [539053756313]                   (RETRIEVAL REFERENCE NUMBER)
+Field-42 : [4992 ]                          (CARD ACCEPTOR IDENTIFICATION CODE)
+Field-43 : [BAX Test / /Paris /FR ]         (CARD ACCEPTOR NAME/LOCATION)
+Field-48 : [00100210002032A9B4A1883D21FA3E19DBCDF174EB06B000501211AA22BB33CC] (ADITIONAL DATA - PRIVATE)
+Field-49 : [978]                            (CURRENCY CODE, TRANSACTION)
+Field-55 : [9F02060000000021009F03060000000000009F1A020250950500000000005F2A0209789A031801099C01009F37040F010E0382021A809F360200019F10200FA501A081010000F010A0FA8E8527130F0000000000000000000000000000009F2608F8F415E88CF69EF8] (IC card system related data)
+Field-64 : [FA71C3422A48D361]               (MESSAGE AUTHENTICATION CODE FIELD)
+----END ISO MESSAGE-----
+```
+
+```
+b64Iso=[EQByBGYACGGCAREGAyABBIYgGWEAAAAAAAAAIQAQF2hBNSgJFSACUAAAAAA1M
+zkwNTM3NTYzMTM0OTkyICAgICAgICAgICBCQVggVGVzdCAgICAgICAgICAgICAgLyAgICAgL1Bh
+cmlzICAgICAgICAgICAgICAgICAvRlIgQDAwMTAwMjEwMDAyMDMyQTlCNEExODgzRDIxRkEzRT
+E5REJDREYxNzRFQjA2QjAwMDUwMTIxMUFBMjJCQjMzQ0MJeGmfAgYAAAAAIQCfAwYAAAAA
+AACfGgICUJUFAAAAAABfKgIJeJoDGAEJnAEAnzcEDwEOA4ICGoCfNgIAAZ8QIA+lAaCBAQAA8B
+Cg+o6FJxMPAAAAAAAAAAAAAAAAAAAAnyYI+PQV6Iz2nvj6ccNCKkjTYQ==]
+```
+
+### Detokenization response:
+
+```
+----BEGIN ISO MESSAGE-----
+MTI : 1110
+BitMap : {2, 14, 39, 48, 56, 64}
+Field-2 : [500050*******0053]               (PAN - PRIMARY ACCOUNT NUMBER)
+Field-14 : [2303]                           (DATE, EXPIRATION)
+Field-39 : [000]                            (ACTION CODE)
+Field-48 : [00100210002032A9B4A1883D21FA3E19DBCDF174EB06B0] (ADITIONAL DATA - PRIVATE)
+Field-56 : [0505434C4F5544060753504159484345] Field-64 : [BA0E969272027185] (Token Related Data) (MESSAGE AUTHENTICATION CODE FIELD)
+----END ISO MESSAGE-----
+```
+
+```
+b64Iso=[ERBABAAAAgEBAREFAAUAFWAAAFMjAwAALjAwMTAwMjEwMDAyMDMyQTlCNEExODgzRDIxRkEzRTE5REJDREYxNzRFQjA2QjAQBQVDTE9VRAYHU1BBWUhDRboOlpJyAnGF]
+```
+
+### Advice request:
+
+```
+----BEGIN ISO MESSAGE-----
+MTI : 1120
+Field-2 : [500050*******0053]               (PAN - PRIMARY ACCOUNT NUMBER)
+Field-3 : [000000]                          (PROCESSING CODE)
+Field-4 : [000000000100]                    (AMOUNT, TRANSACTION)
+Field-7 : [1017684135]                      (TRANSMISSION DATE AND TIME)
+Field-14 : [2303]                           (DATE, EXPIRATION)
+Field-18 : [1520]                           (MERCHANTS TYPE)
+Field-19 : [250]                            (ACQUIRING INSTITUTION COUNTRY CODE)
+Field-22 : [000]                            (POINT OF SERVICE ENTRY MODE)
+Field-23 : [001]                            (CARD SEQUENCE NUMBER)
+Field-37 : [539053756313]                   (RETRIEVAL REFERENCE NUMBER)
+Field-39 : [000]                            (ACTION CODE)
+Field-42 : [4992 ]                          (CARD ACCEPTOR IDENTIFICATION CODE)
+Field-43 : [BAX Test / /Paris /FR ]         (CARD ACCEPTOR NAME/LOCATION)
+Field-48 : [00100210002032A9B4A1883D21FA3E19DBCDF174EB06B000501211AA22BB33CC] (ADITIONAL DATA - PRIVATE)
+Field-49 : [978]                            (CURRENCY CODE, TRANSACTION)
+Field-64 : [CD643CE4CE197782]               (MESSAGE AUTHENTICATION CODE FIELD)
+----END ISO MESSAGE-----
+```
+
+```
+b64Iso=[ESByBGYACmGAAREFAAUAFWAAAFMAAAAAAAAAAQAQF2hBNSMDFSACUAAAAAE1MzkwNTM3NTYzMTMAADQ5OTIgICAgICAgICAgIEJBWCBUZXN0ICAgICAgICAgICAgICAvICAgICAvUGFyaXMgICAgICAgICAgICAgICAgIC9GUiBAMDAxMDAyMTAwMDIwMzJBOUI0QTE4ODNEMjFGQTNFMTlEQkNERjE3NEVCMDZCMDAwNTAxMjExQUEyMkJCMzNDQwl4zWQ85M4Zd4I=]
+```
+
+### Advice response:
+
+```
+----BEGIN ISO MESSAGE-----
+MTI : 1130
+BitMap : {2, 14, 39, 48, 64}
+Field-2 : [603200*******1961]               (PAN - PRIMARY ACCOUNT NUMBER)
+Field-14 : [2809]                           (DATE, EXPIRATION)
+Field-39 : [000]                            (ACTION CODE)
+Field-48 : [00100210002032A9B4A1883D21FA3E19DBCDF174EB06B0] (ADITIONAL DATA - PRIVATE)
+Field-64 : [42648CBBCC0A7E61]               (MESSAGE AUTHENTICATION CODE FIELD)
+----END ISO MESSAGE-----
+```
+
+```
+b64Iso=[ETBABAAAAgEAAREGAyABBIYgGWEoCQAALjAwMTAwMjEwMDAyMDMyQTlCNEExODgzRDIxRkEzRTE5REJDREYxNzRFQjA2QjBCZIy7zAp+YQ==]
+```

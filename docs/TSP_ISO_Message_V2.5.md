@@ -15,49 +15,49 @@ Copyright © 202 1 Thales .
 # Table of Contents
 
 - [Revision status](#revision-status)
-- [Introduction](#introduction)
-  - [Scope](#scope)
-  - [Audience](#audience)
-  - [Reference documents](#reference-documents)
-- [Communication channel between a remote host and the Cloud TSP](#communication-channel-between-a-remote-host-and-the-cloud-tsp)
-- [Structure and Content of Messages](#structure-and-content-of-messages)
-  - [Overview of the message structure](#overview-of-the-message-structure)
-  - [Header](#header)
-  - [Message type](#message-type)
-  - [Primary Bitmap](#primary-bitmap)
-  - [Data Elements Fields attributes](#data-elements-fields-attributes)
-  - [Data Elements Coding](#data-elements-coding)
-- [List of ISO messages supported](#list-of-iso-messages-supported)
-  - [1100 – Detokenization request to the Cloud TSP](#1100--detokenization-request-to-the-cloud-tsp)
-  - [1110 - Detokenization request response from the Cloud TSP](#1110--detokenization-request-response-from-the-cloud-tsp)
-  - [1120 - Transaction Advice communication to the Cloud TSP (re-tokenization)](#1120--transaction-advice-communication-to-the-cloud-tsp-re-tokenization)
-  - [1130 - Transaction Advice communication response from the Cloud TSP (re-tokenization)](#1130--transaction-advice-communication-response-from-the-cloud-tsp-re-tokenization)
-  - [List of data elements in ISO messages](#list-of-data-elements-in-iso-messages)
-- [Requests validation by TSP](#requests-validation-by-tsp)
-  - [TSP Database](#tsp-database) 
-    - [1100 - Detokenization request to the Cloud TSP](#1100--detokenization-request-to-the-cloud-tsp)
-    - [1120 - Transaction Advice communication to the Cloud TSP (re-tokenization)](#1120--transaction-advice-communication-to-the-cloud-tsp-re-tokenization)
-  - [Verification of 1100 - Detokenization request to the Cloud TSP](#verification-of-1100---detokenization-request-to-the-cloud-tsp)
-    - [HCE verification flow](#hce-verification-flow)
-    - [Secure Element verification flow](#secure-element-verification-flow)
-    - [In-app payment cloud cryptogram verification flow](#in-app-payment-cloud-cryptogram-verification-flow)
-  - [Verification of 1120 - Transaction Advice communication to the Cloud TSP (re-tokenization)](#verification-of-1120---transaction-advice-communication-to-the-cloud-tsp-re-tokenization)
-- [Message response codes](#message-response-codes)
-- [Appendix](#appendix)
-  - [Token Assurance Method codification](#token-assurance-method-codification)
-  - [Storage Type](#storage-type)
-  - [Connectivity Requirements](#connectivity-requirements)
-    - [VPN](#vpn)
-    - [TLS Authentication](#tls-authentication)
-    - [MAC usage](#mac-usage)
-  - [MAC Details](#mac-details)
-  - [Key Interchange](#key-interchange)
-    - [MAC Key](#mac-key)
-    - [MAC](#mac)
-    - [Keys type and algorithms](#keys-type-and-algorithms)
-  - [Healthcheck Interface](#healthcheck-interface)
-  - [ISO interface](#iso-interface)
-  - [ISO8583 request/response example](#iso8583-requestresponse-example)
+- [Introduction](#1-introduction)
+  - [Scope](#11-scope)
+  - [Audience](#12-audience)
+  - [Reference documents](#13-reference-documents)
+- [Communication channel between a remote host and the Cloud TSP](#2-communication-channel-between-a-remote-host-and-the-cloud-tsp)
+- [Structure and Content of Messages](#3-structure-and-content-of-messages)
+  - [Overview of the message structure](#31-overview-of-the-message-structure)
+  - [Header](#32-header)
+  - [Message type](#33-message-type)
+  - [Primary Bitmap](#34-primary-bitmap)
+  - [Data Elements Fields attributes](#35-data-elements-fields-attributes)
+  - [Data Elements Coding](#36-data-elements-coding)
+- [List of ISO messages supported](#4-list-of-iso-messages-supported)
+  - [1100 – Detokenization request to the Cloud TSP](#41-1100--detokenization-request-to-the-cloud-tsp)
+  - [1110 - Detokenization request response from the Cloud TSP](#42-1110---detokenization-request-response-from-the-cloud-tsp)
+  - [1120 - Transaction Advice communication to the Cloud TSP (re-tokenization)](#43-1120---transaction-advice-communication-to-the-cloud-tsp-re-)
+  - [1130 - Transaction Advice communication response from the Cloud TSP (re-tokenization)](#44-1130--transaction-advice-communication-response-from-the-cloud-tsp-re-tokenization)
+  - [List of data elements in ISO messages](#5-list-of-data-elements-in-iso-messages)
+- [Requests validation by TSP](#6-requests-validation-by-tsp)
+  - [TSP Database](#61-tsp-database) 
+    - [1100 - Detokenization request to the Cloud TSP](#611-1100--detokenization-request-to-the-cloud-tsp)
+    - [1120 - Transaction Advice communication to the Cloud TSP (re-tokenization)](#612-1120---transaction-advice-communication-to-the-cloud-tsp-re-tokenization)
+  - [Verification of 1100 - Detokenization request to the Cloud TSP](#62-verification-on-1100-detokenization-request-to-the-cloud-tsp)
+    - [HCE verification flow](#621-hce-verification-flow)
+    - [Secure Element verification flow](#622-secure-element-based-verification-flow)
+    - [In-app payment cloud cryptogram verification flow](#623-in-app-payment-cloud-cryptogram-verification-flow)
+  - [Verification of 1120 - Transaction Advice communication to the Cloud TSP (re-tokenization)](#63-verification-on-1120---transaction-advice-communication-to-the-cloud-tsp-re-tokenization)
+- [Message Data Elements Description](#7-message-data-elements-description)
+- [Appendix](#8-appendix)
+  - [Token Assurance Method codification](#81-token-assurance-method-codification)
+  - [Storage Type](#82-storage-type)
+  - [Connectivity Requirements](#83-connectivity-requirements)
+    - [VPN](#831-vpn)
+    - [TLS Authentication](#831-tls-authentication-https)
+    - [MAC usage](#833-mac-usage)
+  - [MAC Details](#84-mac-details)
+  - [Key Interchange](#841-key-interchange)
+    - [MAC Key](#842-mac-key)
+    - [MAC](#843-mac)
+    - [Keys type and algorithms](#844-keys-type-and-algorithms)
+  - [Healthcheck Interface](#85-healthcheck-interface)
+  - [ISO interface](#86-iso-interface)
+  - [ISO8583 request/response example](#87-iso8583-requestresponse-examples)
 
 # Table List
 
@@ -87,26 +87,26 @@ Table 4 - FIELDS PRESENCE IN ISO MESSAGES
 | 2.4      | 12/07/2021 | The following updates apply: <br/> - 8.3.2: added content type description of the HTTP request <br/> - 8.4.3: added the support of SHA-1 hash. Such support is subject to special request <br/> - 8.4.4: added more details regarding the padding method of the MAC                                                                                                                                                                                                                                                                                                                           |
 | 2.5      | 29/09/2022 | Section 1 – Renamed to Introduction and reedited <br/> Section 1.2, 1.3 – Added <br/> Section 2 – Moved as standalone chapter from section <br/> Section 6.2.3 – Added In-app payment cloud cryptogram verification flow <br/> Section 7.12 – Added error codes ‘017’, ‘018’ and ‘019’ <br/> Section 7.15 – Editorial changes <br/> Section 7.18 – Added tags `10` (Device type) and `11` (Token type) as RFU <br/> Section 8.3.2 – Editorial changes <br/> Section 8.4 – Editorial changes <br/> Section 8.4.1 – Editorial changes <br/> Section 8.4.4 – Added ECB in MAC Key wrapping <br/> |
 
-# Introduction
+# 1 Introduction
 
 The Cloud Token Service Provider is a payment tokenization service providing EMV tokenization or PCI tokenization.
 
-## Scope
+## 1.1 Scope
 
 The present document describes the format of messages exchanged between Cloud TSP and a remote Host (Acquirer server or Bank server).
 
-## Audience
+## 1.2 Audience
 
 The audience of this documents is:
 
     * POS aggregators connecting to the detokenization interface of the Cloud TSP service
     * Payment systems implementing tokenization
 
-## Reference documents
+## 1.3 Reference documents
 
     * BankAxept. Cloud TSP In-app payment cloud cryptogram.
 
-# Communication channel between a remote host and the Cloud TSP
+# 2 Communication channel between a remote host and the Cloud TSP
 
 The communication channel is specific to each project and must established a secure channel (see 8.3 Connectivity Requirements)
 
@@ -114,9 +114,9 @@ The messages exchanged through this interface are based on ISO 8583 norm. Using 
 
 This document provides a description of thes messages (message structure and the data elements contained in these messages).
 
-# Structure and Content of Messages
+# 3 Structure and Content of Messages
 
-## Overview of the message structure
+## 3.1 Overview of the message structure
 
 HTTP is used as transport layer for carrying ISO message payload. HTTP header includes a unique
 transaction ID for a given request and some information related to the payload. HTTP body contains
@@ -143,7 +143,7 @@ Payload includes information specified in table below. Each part is detailed in 
 
 Table 1: Message Structure
 
-## Header
+## 3.2 Header
 
 The header is required in all messages. The header value is 8 bytes length.
 It has the following format:
@@ -159,7 +159,7 @@ It has the following format:
 
 Table 2 – Message Header
 
-## Message type
+## 3.3 Message type
 
 The message type is an element of 4 positions serving to identify the general function of the
 message. This element is mandatory in all the messages.
@@ -175,7 +175,7 @@ The following messages are exchanged between Cloud TSP and the remote Host:
 
 Table 3 – List of ISO messages supported
 
-## Primary Bitmap
+## 3.4 Primary Bitmap
 
 The ISO 8583/1993-12-15 uses a messages scheme by bits vector or ‘‘bit maps’’. The bitmap
 structure indicates the presence or absence of data element _(‘1’ inside the bitmap indicates the
@@ -222,7 +222,7 @@ element number. The bit value indicates if DE is present (bit=1) or not
 | 49              | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57 | 58 | 59 | 60 | 61 | 62 | 63 | 64 |
 | 1               | 0  | 0  | 0  | 0  | 0  | 1  | 0  | 0  | 0  | 0  | 0  | 0  | 0  | 0  | 1  |
 
-## Data Elements Fields attributes
+## 3.5 Data Elements Fields attributes
 
 For each Data Element some attributes are specified according to a particular naming described
 hereafter.
@@ -267,7 +267,7 @@ below:
     LLVAR = variable length field using 2 digits for length information.
     LLLVAR = variable length field using 3 digits for length information.
 
-## Data Elements Coding
+## 3.6 Data Elements Coding
 
 Fields with a fixed length:
 
@@ -324,9 +324,9 @@ Example:
     c2 ed 0f 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 9f 26 08 a1 a7 17 06 5f f0 30 a3
     Length: 69 hex = 105 dec
 
-# List of ISO messages supported
+# 4 List of ISO messages supported
 
-## 1100 –Detokenization request to the Cloud TSP
+## 4.1 1100 – Detokenization request to the Cloud TSP
 
 The remote Host is using this message for requesting the Cloud TSP to detokenize a message.
 During the message processing, the Cloud TSP is processing:
@@ -336,7 +336,7 @@ During the message processing, the Cloud TSP is processing:
 
 Note: This message corresponds to the “Token Authorization Request” message in the ‘EMV Payment Tokenisation Specification Technical Framework v2.0”.
 
-## 1110 -Detokenization request response from the Cloud TSP
+## 4.2 1110 - Detokenization request response from the Cloud TSP
 
 The Cloud TSP uses this message for communicating the result of the detokenization request
 message.
@@ -350,7 +350,7 @@ It may be either
 Note: This message corresponds to the “PAN Authorization Request” message in the ‘EMV Payment
 Tokenisation Specification Technical Framework v2.0”.
 
-## 1120 -Transaction Advice communication to the Cloud TSP (re-
+## 4.3 1120 - Transaction Advice communication to the Cloud TSP (re-
 tokenization)
 
 The remote Host is using this message, for communicating the result of the transaction processing to
@@ -372,7 +372,7 @@ During the message processing, the Cloud TSP is processing:
 Note: This message corresponds to the “PAN Authorization Response” message in the ‘EMV
 Payment Tokenisation Specification Technical Framework v2.0”.
 
-## 1130 -Transaction Advice communication response from the Cloud TSP (re-tokenization)
+## 4.4 1130 -Transaction Advice communication response from the Cloud TSP (re-tokenization)
 
 The Cloud TSP uses this message for communicating the result of the Transaction Advice
 communication request message.
@@ -385,7 +385,7 @@ It may be either
 Note: This message corresponds to the “Token Authorization Response” message in the ‘EMV
 Payment Tokenisation Specification Technical Framework v2.0”.
 
-# List of data elements in ISO messages
+# 5 List of data elements in ISO messages
 
 | Field | Description                                                                                                                                | 1100        | 1110         | 1120 | 1130    |
 |-------|--------------------------------------------------------------------------------------------------------------------------------------------|-------------|--------------|------|---------|
@@ -426,12 +426,12 @@ Table 4 – Fields presence in ISO messages
 | M    | Mandatory.                                                                                                                                                                                                                                                            |
 | M\*  | Field currently mandatory. Proposition: If these fields are not currently used, they may be either removed from the document or become optional.                                                                                                                      |
 
-# Requests validation by TSP
+# 6 Requests validation by TSP
 
 TSP performs a number of verifications on reception of 1100 and 1120 request messages using
 information available at TSP level.
 
-## TSP Database
+## 6.1 TSP Database
 
 When processing a message request, the TSP is using as a database either
 
@@ -444,7 +444,7 @@ value present in the origin transaction.
 
 The type of “database” used by the TSP is depending on the type of request message.
 
-### 1100 – Detokenization request to the Cloud TSP
+### 6.1.1 1100 – Detokenization request to the Cloud TSP
 
 The TSP is capable to process two types of de-tokenization request:
 
@@ -468,15 +468,15 @@ when the transaction is a chip transaction.
 Note 2: 1100 is optional for these use cases. The 1120 message (Advise) can be sent without 1100 if detokenization,
 meaning PAN knowledge, is not required.
 
-### 1120 - Transaction Advice communication to the Cloud TSP (re-tokenization)
+### 6.1.2 1120 - Transaction Advice communication to the Cloud TSP (re-tokenization)
 
 The TSP looks up a detokenization request in TSP Transaction History File by using TDT+RRN value as transaction ID. The
 token tied to the transaction ID is used to look up PAN in token vault. TSP checks PAN in token vault matches PAN in
 1120 – Advice Message else an error is returned in Advice response
 
-## Verification on 1100 –Detokenization request to the Cloud TSP
+## 6.2 Verification on 1100 –Detokenization request to the Cloud TSP
 
-### HCE verification flow
+### 6.2.1 HCE verification flow
 
 **Note**: this flow applies to any digital wallet that is based on host-card-emulation (HCE) framework and applies
 software security measures such as single-use-key. Such wallets include Samsung Pay, Google Pay, and proprietary HCE
@@ -514,7 +514,7 @@ wallets.
 |         |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |                  |                |
 | 3.2.11  | Message verified OK                                                                                                                                                                                                                                                                                                                                                                                                                                                               | PAN              | 000            |
 
-### Secure Element-based verification flow
+### 6.2.2 Secure Element-based verification flow
 
 |         | TSP Check                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Field (02,14,35) | Field 39 value |
 |---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------|----------------|
@@ -544,7 +544,7 @@ wallets.
 
 This behavior (option 1 or option 2) is configurable per customer (domestic scheme or any closed loop environment).
 
-### In-app payment cloud cryptogram verification flow
+### 6.2.3 In-app payment cloud cryptogram verification flow
 
 The in-app payment cloud cryptograms is a functionality provided by Cloud TSP for PSD2 compliance. The overview of the
 functionality and format of the cryptograms is described in (1).
@@ -585,7 +585,7 @@ applicability of the flow is performed by Field 22, Sub-field 1 PAN Entry Mode b
 
 This behavior (option 1 or option 2) is configurable per customer (domestic scheme or any closed loop environment)
 
-## Verification on 1120 - Transaction Advice communication to the Cloud TSP (re-tokenization)
+## 6.3 Verification on 1120 - Transaction Advice communication to the Cloud TSP (re-tokenization)
 
 |         | TSP Check                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Notification sent | Field (02,14,35) | Field 39 value |
 |---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|------------------|----------------|
@@ -616,12 +616,12 @@ This behavior (option 1 or option 2) is configurable per customer (domestic sche
 | 3.2.4   | Request the TSH to send a notification message to the mobile. <br/> The values for transactionType and transactionResult follow: <br/> <table><th>Field 03 position 1-2</th><th>Field 39</th><th>Transaction Type</th><th>Transaction Result</th><tr><td>'00'</td><td>'00' <br/> not '00'</td><td>PURCHASE</td><td>APPROVED <br/> DECLINED</td></tr><tr><td>'20'</td><td>'00' <br/> not '00'</td><td>REFUND</td><td>APPROVED <br/> DECLINED</td></tr><tr><td>'22'</td><td>'00' <br/> not '00'</td><td>PURCHASE</td><td>APPROVED <br/> DECLINED</td></tr><tr><td>'52'</td><td>'00' <br/> not '00'</td><td>PURCHASE</td><td>APPROVED <br/> DECLINED</td></tr><tr><td>'92'</td><td>'00' <br/> not '00'</td><td>PURCHASE</td><td>APPROVED <br/> DECLINED</td></tr></table> | Yes               | DPAN             | 000            |
 
 
-# Message Data Elements Description
+# 7 Message Data Elements Description
 
 This section provides detailed descriptions of all data elements used by Cloud TSP / Remote Host
 Interface messages.
 
-## Field n° 02 – Primary Account Number
+## 7.1 Field n° 02 – Primary Account Number
 
 |                 |                                                                                                                                                                                                                                  |
 |-----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -758,9 +758,9 @@ Interface messages.
 | **Attribute**   | b-8                                                                                                                                                                                                                      |
 | **Description** | Message Authentication Code [MAC]) validates the source and the text of the message between the sender and the receiver. <br/> It is generated using the MAC key provided in field 48 (Identifier “001”) See MAC details |
 
-# Appendix
+# 8 Appendix
 
-## Token Assurance Method codification
+## 8.1 Token Assurance Method codification
 
 The values are defined in the document: “Token Authorization Response” message in the ‘EMV Payment Tokenisation
 Specification Technical Framework v2.0”.
@@ -783,7 +783,7 @@ Specification Technical Framework v2.0”.
 | **20 - 89**                     | **Token Programme Specific**                                            |
 | **99 - 99**                     | **Reserved for future EMVCo use**                                       |
 
-## Storage Type
+## 8.2 Storage Type
 
 Attributes of the device that may be used to identify the specific device where a Payment Token is stored.
 
@@ -796,15 +796,15 @@ Attributes of the device that may be used to identify the specific device where 
 | 05           | SE                                  |
 | 06           | Virtual execution environment (VEE) |
 
-## Connectivity Requirements
+## 8.3 Connectivity Requirements
 
 A secure channel must be established between the Cloud TSP and the remote Host (Acquirer server  or Bank server) as described below.
 
-### VPN
+### 8.3.1 VPN
 
 A VPN (IPSEC) coul be used with TLS Server Authentication but not recommended option
 
-### TLS Authentication (HTTPS)
+### 8.3.1 TLS Authentication (HTTPS)
 
 The TLS shall be used to get end-to-end encryption.
 If VPN is used, TLS shall be TLS server authentication otherwise TLS mutual authentication.
@@ -824,11 +824,11 @@ The full ISO payload will be exchanged using HTTP Request/Response scheme:
     * 4xx if Cloud TSP fails to decode and parse ISO message. No ISO message will be present.
     * 5xx connection error. No ISO message will be present.
 
-### MAC usage
+### 8.3.3 MAC usage
 
 Usage of MAC is required in all ISO Message (Request and Response). See MAC details
 
-## MAC details
+## 8.4 MAC details
 
 The following principles shall be applied:
 * All ISO messages are protected using a MAC.
@@ -837,7 +837,7 @@ The following principles shall be applied:
 * Key Interchange will be exchanged between each party encrypted under a ZMK
 * The ZMK (Zone Master Key) are exchanged during a key ceremony and imported into HSM.
 
-## Key Interchange
+## 8.4.1 Key Interchange
 
 KI (Key Interchange) is the encrypted key used to encrypt the ephemeral MAC Key
 KI shall be exchanged between the parties during the setup phase.
@@ -845,7 +845,7 @@ KI are exchanged encrypted under ZMK and shall be protected by HSM.
 KI is identifed by a key index (1 to 255) and allow Key Interchange switchover (key renewal)
 Key index is present in ISO Message in Field n° 48 – Additional data, private (Identifier "001", the encrypted key index)
 
-### MAC key
+### 8.4.2 MAC key
 
 A MAC key shall be present in each ISO message, encrypted under KI in Field n° 48 – Additional data, private (Identifier "002", the MAC key)
 
@@ -853,14 +853,14 @@ The MAC key is an ephemeral key to be generated by each party and could be reuse
 
 The maximum lifetime recommendation for an ephemeral MAC key is 1 hour.
 
-### MAC
+### 8.4.3 MAC
 
 MAC shall be computed for each ISO Message.
 MAC is present in Field n° 64 – Message Authentication Code
 Input data of the MAC is SHA-256 hash of the full ISO payload encoded to bytes excluding the mac value field (Field 64).
 **Note:** SHA-256 hash is used by default. SHA-1 hash can be used under request.
 
-### Keys type and algorithms
+### 8.4.4 Keys type and algorithms
 
 |                  |                                                                                                                                                                                                                                                                                    |
 |------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -870,7 +870,7 @@ Input data of the MAC is SHA-256 hash of the full ISO payload encoded to bytes e
 | MAC              | MAC Algorithm 3 (ISO 9797-1 Algorithm 3). Padding method 1 is used: input data is completed with `0`s until the data reaches a multiple of 8-byte blocks. No `0` is added if the input is already a multiple of 8-byte blocks. <br/> The MAC is the 8 leftmost bytes of the output |
 (*) KI Key length depends to remote Host capability
 
-## Healthcheck interface
+## 8.5 Healthcheck interface
 
 A healthcheck mechanism allow testing on a regular basis the peer to peer connectivity. On HTTP  request to dedicated URL, HTTP 200 is returned by TSP while the status is up and running.
 
@@ -880,7 +880,7 @@ URL is formatted as below:
 
     URL: https://<domain name>/gtotx/api/iso/healthCheck
 
-## ISO interface
+## 8.6 ISO interface
 
 ISO message are carried over HTTP.
 
@@ -890,7 +890,7 @@ URL is formatted as below:
 
     URL: https:// <domain name>/gtotx/api/iso/v10/msg
 
-## ISO8583 request/response examples
+## 8.7 ISO8583 request/response examples
 
 ### Detokenization Request:
 

@@ -978,57 +978,75 @@ URL is formatted as below, the actual URL will be provided:
 
 ## 8.7 ISO8583 request/response examples
 
+The following examples illustrate the ISO8583 request/response messages that are exchanged between the remote host and the Cloud TSP.
+
 ### Detokenization Request:
 
-```
-----BEGIN ISO MESSAGE-----
-MTI : 1100
-BitMap : {2, 3, 4, 7, 14, 18, 19, 22, 23, 37, 42, 43, 48, 49, 55, 64}
-Field-2 : [603200*******1961]               (PAN - PRIMARY ACCOUNT NUMBER)
-Field-3 : [000000]                          (PROCESSING CODE)
-Field-4 : [000000002100]                    (AMOUNT, TRANSACTION)
-Field-7 : [1017684135]                      (TRANSMISSION DATE AND TIME)
-Field-14 : [2809]                           (DATE, EXPIRATION)
-Field-18 : [1520]                           (MERCHANTS TYPE)
-Field-19 : [250]                            (ACQUIRING INSTITUTION COUNTRY CODE)
-Field-22 : [000]                            (POINT OF SERVICE ENTRY MODE)
-Field-23 : [000]                            (CARD SEQUENCE NUMBER)
-Field-37 : [539053756313]                   (RETRIEVAL REFERENCE NUMBER)
-Field-42 : [4992 ]                          (CARD ACCEPTOR IDENTIFICATION CODE)
-Field-43 : [BAX Test / /Paris /FR ]         (CARD ACCEPTOR NAME/LOCATION)
-Field-48 : [00100210002032A9B4A1883D21FA3E19DBCDF174EB06B000501211AA22BB33CC] (ADITIONAL DATA - PRIVATE)
-Field-49 : [978]                            (CURRENCY CODE, TRANSACTION)
-Field-55 : [9F02060000000021009F03060000000000009F1A020250950500000000005F2A0209789A031801099C01009F37040F010E0382021A809F360200019F10200FA501A081010000F010A0FA8E8527130F0000000000000000000000000000009F2608F8F415E88CF69EF8] (IC card system related data)
-Field-64 : [FA71C3422A48D361]               (MESSAGE AUTHENTICATION CODE FIELD)
-----END ISO MESSAGE-----
-```
+A detokenization request is sent by the remote host to the Cloud TSP to retrieve the PAN from a token.
 
 ```
-b64Iso=[EQByBGYACGGCAREGAyABBIYgGWEAAAAAAAAAIQAQF2hBNSgJFSACUAAAAAA1M
-zkwNTM3NTYzMTM0OTkyICAgICAgICAgICBCQVggVGVzdCAgICAgICAgICAgICAgLyAgICAgL1Bh
-cmlzICAgICAgICAgICAgICAgICAvRlIgQDAwMTAwMjEwMDAyMDMyQTlCNEExODgzRDIxRkEzRT
-E5REJDREYxNzRFQjA2QjAwMDUwMTIxMUFBMjJCQjMzQ0MJeGmfAgYAAAAAIQCfAwYAAAAA
-AACfGgICUJUFAAAAAABfKgIJeJoDGAEJnAEAnzcEDwEOA4ICGoCfNgIAAZ8QIA+lAaCBAQAA8B
-Cg+o6FJxMPAAAAAAAAAAAAAAAAAAAAnyYI+PQV6Iz2nvj6ccNCKkjTYQ==]
+POST /gtotx/api/iso/stoepay/v10/msg/stoepay HTTP/1.1
+Host: bax-t1-gtotx-app-lb.osl.basefarm.net:28100
+Accept: text/plain, application/json, application/*+json, */*
+TID: 001cb3dc-b2f6-4c71-a0c4-53ed96799109
+header: 41000000
+Content-Type: text/html
+Content-Length: 412
+
+EQByBGYACGGCAREGAyABBIYgGWEAAAAAAAAAIQAGBQYBQygJFSACUAAAAAA3NjM0MDgzMjQyMjM0OTkyICAgICAgICAgICBCQVggVGVzdCAgICAgICAgICAgICAgLyAgICAgL1BhcmlzICAgICAgICAgICAgICAgICAvRlIgQDAwMTAwMjExMDAyMDMyRTU0MTIxQTBCQTVBQkM1NjVFOEYzRTYyNUU2Q0VGRTAwMDUwMTIxMUFBMjJCQjMzQ0MJeGmfAgYAAAAAIQCfAwYAAAAAAACfGgICUJUFAAAAAABfKgIJeJoDGAEJnAEAnzcEDwEOA4ICGoCfNgIAAZ8QIA+lAaCBAQAA8BCg+o6FJxMPAAAAAAAAAAAAAAAAAAAAnyYI+PQV6Iz2nvgIZxuvDPXbRg==
+
 ```
+
+| Field      | Value                                                                                                                                                                                                                                                                                                                                            | Description                        |
+|------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------|
+| MTI        | 1100                                                                                                                                                                                                                                                                                                                                             |                                    |
+| BitMap     | {2, 3, 4, 7, 14, 18, 19, 22, 23, 37, 42, 43, 48, 49, 55, 64}                                                                                                                                                                                                                                                                                     |                                    |
+| Field-2    | 603200\*\*\*\*\*\*\*\*1961                                                                                                                                                                                                                                                                                                                       | PAN - PRIMARY ACCOUNT NUMBER       |
+| Field-3    | 000000                                                                                                                                                                                                                                                                                                                                           | PROCESSING CODE                    |
+| Field-4    | 000000002100                                                                                                                                                                                                                                                                                                                                     | AMOUNT, TRANSACTION                |
+| Field-7    | 0605060143                                                                                                                                                                                                                                                                                                                                       | TRANSMISSION DATE AND TIME         |
+| Field-14   | 2809                                                                                                                                                                                                                                                                                                                                             | DATE, EXPIRATION                   |
+| Field-18   | 1520                                                                                                                                                                                                                                                                                                                                             | MERCHANTS TYPE                     |
+| Field-19   | 250                                                                                                                                                                                                                                                                                                                                              | ACQUIRING INSTITUTION COUNTRY CODE |
+| Field-22   | 000                                                                                                                                                                                                                                                                                                                                              | POINT OF SERVICE ENTRY MODE        |
+| Field-23   | 000                                                                                                                                                                                                                                                                                                                                              | CARD SEQUENCE NUMBER               |
+| Field-37   | 763408324223                                                                                                                                                                                                                                                                                                                                     | RETRIEVAL REFERENCE NUMBER         |
+| Field-42   | 4992&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                                                                                                                                                                                                                                                               | CARD ACCEPTOR IDENTIFICATION CODE  |
+| Field-43   | BAX Test&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/Paris&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/FR | CARD ACCEPTOR NAME/LOCATION        |
+| Field-48   | 00100211002032E54121A0BA5ABC565E8F3E625E6CEFE000501211AA22BB33CC                                                                                                                                                                                                                                                                                 | ADDITIONAL DATA - PRIVATE          |
+| Field-49   | 978                                                                                                                                                                                                                                                                                                                                              | CURRENCY CODE, TRANSACTION         |
+| Field-55   | 9F02060000000021009F03060000000000009F1A020250950500000000005F2A0209789A031801099C01009F37040F010E0382021A809F360200019F10200FA501A081010000F010A0FA8E8527130F0000000000000000000000000000009F2608F8F415E88CF69EF8                                                                                                                               | IC card system related data        |
+| Field-64   | 08671BAF0CF5DB46                                                                                                                                                                                                                                                                                                                                 | MESSAGE AUTHENTICATION CODE FIELD  |
+
 
 ### Detokenization response:
 
 ```
-----BEGIN ISO MESSAGE-----
-MTI : 1110
-BitMap : {2, 14, 39, 48, 56, 64}
-Field-2 : [500050*******0053]               (PAN - PRIMARY ACCOUNT NUMBER)
-Field-14 : [2303]                           (DATE, EXPIRATION)
-Field-39 : [000]                            (ACTION CODE)
-Field-48 : [00100210002032A9B4A1883D21FA3E19DBCDF174EB06B0] (ADITIONAL DATA - PRIVATE)
-Field-56 : [0505434C4F5544060753504159484345] Field-64 : [BA0E969272027185] (Token Related Data) (MESSAGE AUTHENTICATION CODE FIELD)
-----END ISO MESSAGE-----
-```
+
+HTTP/1.1 200 OK
+TID: 001cb3dc-b2f6-4c71-a0c4-53ed96799109
+header: 41000000
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 120
+Date: Thu, 05 Jun 2025 06:01:44 GMT
+Keep-Alive: timeout=20
+Connection: keep-alive
+
+ERBABAAAAgEBAREFAAUAFWAAAFMnBAAALjAwMTAwMjExMDAyMDMyQ0NDQjk2MjE3ODQ4NTU5RkI1RjdFRUZDMjA4NjEzNUEJBgdTUEFZSENFFhQCxLmfVUI=
+
 
 ```
-b64Iso=[ERBABAAAAgEBAREFAAUAFWAAAFMjAwAALjAwMTAwMjEwMDAyMDMyQTlCNEExODgzRDIxRkEzRTE5REJDREYxNzRFQjA2QjAQBQVDTE9VRAYHU1BBWUhDRboOlpJyAnGF]
-```
+
+| Field      | Value                                          | Description                        |
+|------------|------------------------------------------------|------------------------------------|
+| MTI        | 1110                                           |                                    |
+| Field-2    | 500050\*\*\*\*\*\*\*\*0053                     | PAN - PRIMARY ACCOUNT NUMBER       |
+| Field-14   | 2704                                           | DATE, EXPIRATION                   |
+| Field-39   | 000                                            | ACTION CODE                        |
+| Field-48   | 00100211002032CCCB96217848559FB5F7EEFC2086135A | ADDITIONAL DATA - PRIVATE          |
+| Field-56   | 060753504159484345                             | Token Related Data                 |
+| Field-64   | 161402C4B99F5542                               | MESSAGE AUTHENTICATION CODE FIELD  |
+
 
 ### Advice request:
 

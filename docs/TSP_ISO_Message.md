@@ -983,7 +983,8 @@ The following examples illustrate the ISO8583 request/response messages that are
 
 ### Detokenization Request:
 
-A detokenization request is sent by the remote host to the Cloud TSP to retrieve the PAN from a token.
+A detokenization request is sent by the remote host to the Cloud TSP to retrieve the PAN from a token. The example is
+has a 2KEY 3DES MAC key and uses SHA-256 hash for the MAC computation. Field-55 is from a PURE wallet.
 
 #### HTTP dump
 
@@ -1025,6 +1026,8 @@ EQByBGYACGGCAREGAyABBIYgGWEAAAAAAAAAIQAGBQYBQygJFSACUAAAAAA3NjM0MDgzMjQyMjM0OTky
 
 ### Detokenization response:
 
+The response is successful and contains the PAN in Field-2. The MAC is computed using SHA-256 hash and 2KEY 3DES MAC key.
+
 #### HTTP dump
 
 ```
@@ -1053,6 +1056,9 @@ ERBABAAAAgEBAREFAAUAFWAAAFMnBAAALjAwMTAwMjExMDAyMDMyQ0NDQjk2MjE3ODQ4NTU5RkI1RjdF
 
 ### Advice request:
 
+The advice request is sent to notify the wallet about the detokenization result. Field 2 contains the PAN, field-39
+contains the result of the detokenization.
+
 #### HTTP dump
 
 ```
@@ -1070,28 +1076,30 @@ ESByBGYACmGAAREFAAUAFWAAAFMAAAAAAAAAAQAGBQhDJScEFSACUAAAAAE2MDg2NzE5ODA2NDIAADQ5
 
 #### Fields specification
 
-| Field     | Value                                              | Description                        |
-|-----------|----------------------------------------------------|------------------------------------|
-| MTI       | 1120                                               |                                    |
-| BitMap    | {2, 3, 4, 7, 14, 18, 19, 22, 23, 37, 39, 42, 43, 48, 49, 64} |                                    |
-| Field-2   | 500050\*\*\*\*\*\*\*\*0053                         | PAN - PRIMARY ACCOUNT NUMBER       |
-| Field-3   | 000000                                             | PROCESSING CODE                    |
-| Field-4   | 000000000100                                       | AMOUNT, TRANSACTION                |
-| Field-7   | 0605084325                                         | TRANSMISSION DATE AND TIME         |
-| Field-14  | 2704                                               | DATE, EXPIRATION                   |
-| Field-18  | 1520                                               | MERCHANTS TYPE                     |
-| Field-19  | 250                                                | ACQUIRING INSTITUTION COUNTRY CODE |
-| Field-22  | 000                                                | POINT OF SERVICE ENTRY MODE        |
-| Field-23  | 001                                                | CARD SEQUENCE NUMBER               |
-| Field-37  | 608671980642                                       | RETRIEVAL REFERENCE NUMBER         |
-| Field-39  | 000                                                | ACTION CODE                        |
-| Field-42  | 4992&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | CARD ACCEPTOR IDENTIFICATION CODE  |
+| Field     | Value                                                                                                                                                                                                                                                                                                                                            | Description                        |
+|-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------|
+| MTI       | 1120                                                                                                                                                                                                                                                                                                                                             |                                    |
+| BitMap    | {2, 3, 4, 7, 14, 18, 19, 22, 23, 37, 39, 42, 43, 48, 49, 64}                                                                                                                                                                                                                                                                                     |                                    |
+| Field-2   | 500050\*\*\*\*\*\*\*\*0053                                                                                                                                                                                                                                                                                                                       | PAN - PRIMARY ACCOUNT NUMBER       |
+| Field-3   | 000000                                                                                                                                                                                                                                                                                                                                           | PROCESSING CODE                    |
+| Field-4   | 000000000100                                                                                                                                                                                                                                                                                                                                     | AMOUNT, TRANSACTION                |
+| Field-7   | 0605084325                                                                                                                                                                                                                                                                                                                                       | TRANSMISSION DATE AND TIME         |
+| Field-14  | 2704                                                                                                                                                                                                                                                                                                                                             | DATE, EXPIRATION                   |
+| Field-18  | 1520                                                                                                                                                                                                                                                                                                                                             | MERCHANTS TYPE                     |
+| Field-19  | 250                                                                                                                                                                                                                                                                                                                                              | ACQUIRING INSTITUTION COUNTRY CODE |
+| Field-22  | 000                                                                                                                                                                                                                                                                                                                                              | POINT OF SERVICE ENTRY MODE        |
+| Field-23  | 001                                                                                                                                                                                                                                                                                                                                              | CARD SEQUENCE NUMBER               |
+| Field-37  | 608671980642                                                                                                                                                                                                                                                                                                                                     | RETRIEVAL REFERENCE NUMBER         |
+| Field-39  | 000                                                                                                                                                                                                                                                                                                                                              | ACTION CODE                        |
+| Field-42  | 4992&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                                                                                                                                                                                                                                                               | CARD ACCEPTOR IDENTIFICATION CODE  |
 | Field-43  | BAX Test&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/Paris&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/FR | CARD ACCEPTOR NAME/LOCATION        |
-| Field-48  | 001002110020328A7F352F86B3F3D2486DB1D7B735080A00501211AA22BB33CC | ADDITIONAL DATA - PRIVATE          |
-| Field-49  | 978                                                | CURRENCY CODE, TRANSACTION         |
-| Field-64  | 454D14F8695CE5D2                                   | MESSAGE AUTHENTICATION CODE FIELD  |
+| Field-48  | 001002110020328A7F352F86B3F3D2486DB1D7B735080A00501211AA22BB33CC                                                                                                                                                                                                                                                                                 | ADDITIONAL DATA - PRIVATE          |
+| Field-49  | 978                                                                                                                                                                                                                                                                                                                                              | CURRENCY CODE, TRANSACTION         |
+| Field-64  | 454D14F8695CE5D2                                                                                                                                                                                                                                                                                                                                 | MESSAGE AUTHENTICATION CODE FIELD  |
 
 ### Advice response:
+
+The advice response contains the token pan in field-2.
 
 #### HTTP dump
 

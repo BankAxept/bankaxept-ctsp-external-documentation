@@ -91,6 +91,7 @@ Table 4 - FIELDS PRESENCE IN ISO MESSAGES
 | 2.5      | 29/09/2022 | Section 1 – Renamed to Introduction and reedited <br/> Section 1.2, 1.3 – Added <br/> Section 2 – Moved as standalone chapter from section <br/> Section 6.2.3 – Added In-app payment cloud cryptogram verification flow <br/> Section 7.12 – Added error codes ‘017’, ‘018’ and ‘019’ <br/> Section 7.15 – Editorial changes <br/> Section 7.18 – Added tags `10` (Device type) and `11` (Token type) as RFU <br/> Section 8.3.2 – Editorial changes <br/> Section 8.4 – Editorial changes <br/> Section 8.4.1 – Editorial changes <br/> Section 8.4.4 – Added ECB in MAC Key wrapping <br/> |
 | 2.6      | 06/02/2023 | Section 7.2 – Add transaction type code 36 <br/> Section 7.5 – Added new field 12 Date and time local transaction <br/> Section 7.19 – Added tags, 10, 11 and 12 <br/> Section 8.4 – Clearifications on MAC details <br/> Section 8.4 – Include new option for AES in MAC                                                                                                                                                                                                                                                                                                                     |                                                                                                                                                                                                                                                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | 2.7      | 07/08/2023 | Section 7.6 – Add support for unknown token expiry from processor <br/> Section 8.3 removed VPN section as it is not supported. <br/> Section 7.5 Clarification on field 12 <br/> Section 8.5 Details about health check <br/> Section 8.6 Corrected URL scheme                                                                                                                                                                                                                                                                                                                               |                                                                                                                                                                                                                                                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| 2.8      | 07/08/2023 | Section 8.7 – Update examples with currently supported message format.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |                                                                                                                                                                                                                                                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 
 # 1 Introduction
 
@@ -984,18 +985,21 @@ The following examples illustrate the ISO8583 request/response messages that are
 
 A detokenization request is sent by the remote host to the Cloud TSP to retrieve the PAN from a token.
 
+#### HTTP dump
+
 ```
 POST /gtotx/api/iso/stoepay/v10/msg/stoepay HTTP/1.1
-Host: bax-t1-gtotx-app-lb.osl.basefarm.net:28100
-Accept: text/plain, application/json, application/*+json, */*
+Host: ctsp-proc-pp.baxlab.no:443
+Accept: */*
 TID: 001cb3dc-b2f6-4c71-a0c4-53ed96799109
 header: 41000000
-Content-Type: text/html
+Content-Type: text/plain
 Content-Length: 412
 
 EQByBGYACGGCAREGAyABBIYgGWEAAAAAAAAAIQAGBQYBQygJFSACUAAAAAA3NjM0MDgzMjQyMjM0OTkyICAgICAgICAgICBCQVggVGVzdCAgICAgICAgICAgICAgLyAgICAgL1BhcmlzICAgICAgICAgICAgICAgICAvRlIgQDAwMTAwMjExMDAyMDMyRTU0MTIxQTBCQTVBQkM1NjVFOEYzRTYyNUU2Q0VGRTAwMDUwMTIxMUFBMjJCQjMzQ0MJeGmfAgYAAAAAIQCfAwYAAAAAAACfGgICUJUFAAAAAABfKgIJeJoDGAEJnAEAnzcEDwEOA4ICGoCfNgIAAZ8QIA+lAaCBAQAA8BCg+o6FJxMPAAAAAAAAAAAAAAAAAAAAnyYI+PQV6Iz2nvgIZxuvDPXbRg==
-
 ```
+
+#### Fields specification
 
 | Field      | Value                                                                                                                                                                                                                                                                                                                                            | Description                        |
 |------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------|
@@ -1021,20 +1025,19 @@ EQByBGYACGGCAREGAyABBIYgGWEAAAAAAAAAIQAGBQYBQygJFSACUAAAAAA3NjM0MDgzMjQyMjM0OTky
 
 ### Detokenization response:
 
-```
+#### HTTP dump
 
+```
 HTTP/1.1 200 OK
 TID: 001cb3dc-b2f6-4c71-a0c4-53ed96799109
 header: 41000000
-Content-Type: application/x-www-form-urlencoded
+Content-Type: text/plain
 Content-Length: 120
 Date: Thu, 05 Jun 2025 06:01:44 GMT
 Keep-Alive: timeout=20
 Connection: keep-alive
 
 ERBABAAAAgEBAREFAAUAFWAAAFMnBAAALjAwMTAwMjExMDAyMDMyQ0NDQjk2MjE3ODQ4NTU5RkI1RjdFRUZDMjA4NjEzNUEJBgdTUEFZSENFFhQCxLmfVUI=
-
-
 ```
 
 | Field      | Value                                          | Description                        |
@@ -1050,46 +1053,67 @@ ERBABAAAAgEBAREFAAUAFWAAAFMnBAAALjAwMTAwMjExMDAyMDMyQ0NDQjk2MjE3ODQ4NTU5RkI1RjdF
 
 ### Advice request:
 
-```
-----BEGIN ISO MESSAGE-----
-MTI : 1120
-Field-2 : [500050*******0053]               (PAN - PRIMARY ACCOUNT NUMBER)
-Field-3 : [000000]                          (PROCESSING CODE)
-Field-4 : [000000000100]                    (AMOUNT, TRANSACTION)
-Field-7 : [1017684135]                      (TRANSMISSION DATE AND TIME)
-Field-14 : [2303]                           (DATE, EXPIRATION)
-Field-18 : [1520]                           (MERCHANTS TYPE)
-Field-19 : [250]                            (ACQUIRING INSTITUTION COUNTRY CODE)
-Field-22 : [000]                            (POINT OF SERVICE ENTRY MODE)
-Field-23 : [001]                            (CARD SEQUENCE NUMBER)
-Field-37 : [539053756313]                   (RETRIEVAL REFERENCE NUMBER)
-Field-39 : [000]                            (ACTION CODE)
-Field-42 : [4992 ]                          (CARD ACCEPTOR IDENTIFICATION CODE)
-Field-43 : [BAX Test / /Paris /FR ]         (CARD ACCEPTOR NAME/LOCATION)
-Field-48 : [00100210002032A9B4A1883D21FA3E19DBCDF174EB06B000501211AA22BB33CC] (ADITIONAL DATA - PRIVATE)
-Field-49 : [978]                            (CURRENCY CODE, TRANSACTION)
-Field-64 : [CD643CE4CE197782]               (MESSAGE AUTHENTICATION CODE FIELD)
-----END ISO MESSAGE-----
-```
+#### HTTP dump
 
 ```
-b64Iso=[ESByBGYACmGAAREFAAUAFWAAAFMAAAAAAAAAAQAQF2hBNSMDFSACUAAAAAE1MzkwNTM3NTYzMTMAADQ5OTIgICAgICAgICAgIEJBWCBUZXN0ICAgICAgICAgICAgICAvICAgICAvUGFyaXMgICAgICAgICAgICAgICAgIC9GUiBAMDAxMDAyMTAwMDIwMzJBOUI0QTE4ODNEMjFGQTNFMTlEQkNERjE3NEVCMDZCMDAwNTAxMjExQUEyMkJCMzNDQwl4zWQ85M4Zd4I=]
+POST /gtotx/api/iso/stoepay/v10/msg/stoepay HTTP/1.1
+Host: ctsp-proc-pp.baxlab.no:443
+Accept: text/plain, text/*
+TID: 88a1a721-a3dc-4502-a340-435c4e6a8064
+header: 41000000
+Content-Type: text/html
+Content-Length: 272
+
+ESByBGYACmGAAREFAAUAFWAAAFMAAAAAAAAAAQAGBQhDJScEFSACUAAAAAE2MDg2NzE5ODA2NDIAADQ5OTIgICAgICAgICAgIEJBWCBUZXN0ICAgICAgICAgICAgICAvICAgICAvUGFyaXMgICAgICAgICAgICAgICAgIC9GUiBAMDAxMDAyMTEwMDIwMzI4QTdGMzUyRjg2QjNGM0QyNDg2REIxRDdCNzM1MDgwQTAwNTAxMjExQUEyMkJCMzNDQwl4RU0U+Glc5dI=
+
 ```
+
+#### Fields specification
+
+| Field     | Value                                              | Description                        |
+|-----------|----------------------------------------------------|------------------------------------|
+| MTI       | 1120                                               |                                    |
+| BitMap    | {2, 3, 4, 7, 14, 18, 19, 22, 23, 37, 39, 42, 43, 48, 49, 64} |                                    |
+| Field-2   | 500050\*\*\*\*\*\*\*\*0053                         | PAN - PRIMARY ACCOUNT NUMBER       |
+| Field-3   | 000000                                             | PROCESSING CODE                    |
+| Field-4   | 000000000100                                       | AMOUNT, TRANSACTION                |
+| Field-7   | 0605084325                                         | TRANSMISSION DATE AND TIME         |
+| Field-14  | 2704                                               | DATE, EXPIRATION                   |
+| Field-18  | 1520                                               | MERCHANTS TYPE                     |
+| Field-19  | 250                                                | ACQUIRING INSTITUTION COUNTRY CODE |
+| Field-22  | 000                                                | POINT OF SERVICE ENTRY MODE        |
+| Field-23  | 001                                                | CARD SEQUENCE NUMBER               |
+| Field-37  | 608671980642                                       | RETRIEVAL REFERENCE NUMBER         |
+| Field-39  | 000                                                | ACTION CODE                        |
+| Field-42  | 4992&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | CARD ACCEPTOR IDENTIFICATION CODE  |
+| Field-43  | BAX Test&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/Paris&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/FR | CARD ACCEPTOR NAME/LOCATION        |
+| Field-48  | 001002110020328A7F352F86B3F3D2486DB1D7B735080A00501211AA22BB33CC | ADDITIONAL DATA - PRIVATE          |
+| Field-49  | 978                                                | CURRENCY CODE, TRANSACTION         |
+| Field-64  | 454D14F8695CE5D2                                   | MESSAGE AUTHENTICATION CODE FIELD  |
 
 ### Advice response:
 
-```
-----BEGIN ISO MESSAGE-----
-MTI : 1130
-BitMap : {2, 14, 39, 48, 64}
-Field-2 : [603200*******1961]               (PAN - PRIMARY ACCOUNT NUMBER)
-Field-14 : [2809]                           (DATE, EXPIRATION)
-Field-39 : [000]                            (ACTION CODE)
-Field-48 : [00100210002032A9B4A1883D21FA3E19DBCDF174EB06B0] (ADITIONAL DATA - PRIVATE)
-Field-64 : [42648CBBCC0A7E61]               (MESSAGE AUTHENTICATION CODE FIELD)
-----END ISO MESSAGE-----
-```
+#### HTTP dump
 
 ```
-b64Iso=[ETBABAAAAgEAAREGAyABBIYgGWEoCQAALjAwMTAwMjEwMDAyMDMyQTlCNEExODgzRDIxRkEzRTE5REJDREYxNzRFQjA2QjBCZIy7zAp+YQ==]
+HTTP/1.1 200 OK
+TID: 001cb3dc-b2f6-4c71-a0c4-53ed96799109
+header: 41000000
+Content-Type: text/plain
+Content-Length: 120
+Date: Thu, 05 Jun 2025 06:01:44 GMT
+Keep-Alive: timeout=20
+Connection: keep-alive
+
+ERBABAAAAgEBAREFAAUAFWAAAFMnBAAALjAwMTAwMjExMDAyMDMyQTA2QTUwNjFDQkI5RjE1RTE1Nzg4MEM0MDkzQ0YzNzQJBgdTUEFZSENF1kvCKDWu060=
+
 ```
+
+| Field     | Value                                          | Description                        |
+|-----------|------------------------------------------------|------------------------------------|
+| MTI       | 1130                                           |                                    |
+| Field-2   | 603200\*\*\*\*\*\*\*\*1961                     | PAN - PRIMARY ACCOUNT NUMBER       |
+| Field-14  | 2809                                           | DATE, EXPIRATION                   |
+| Field-39  | 000                                            | ACTION CODE                        |
+| Field-48  | 00100211002032BD4E0A1DAAA47C25CB1EF6CA107DBECA | ADDITIONAL DATA - PRIVATE          |
+| Field-64  | 729A79DB1D60F465                               | MESSAGE AUTHENTICATION CODE FIELD  |

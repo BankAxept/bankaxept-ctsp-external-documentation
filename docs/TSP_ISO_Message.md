@@ -48,7 +48,7 @@ Copyright © 202 1 Thales .
   - [Storage Type](#82-storage-type)
   - [Connectivity Requirements](#83-connectivity-requirements)
     - [TLS Authentication](#831-tls-authentication-https)
-    - [MAC usage](#832-mac-usage)
+    - [MAC usage](#833-mac-usage)
   - [MAC Details](#84-mac-details)
     - [Message transformations](#841-message-transformations)
     - [MAC Algorithm](#842-mac-algorithms)
@@ -91,6 +91,7 @@ Table 4 - FIELDS PRESENCE IN ISO MESSAGES
 | 2.5      | 29/09/2022 | Section 1 – Renamed to Introduction and reedited <br/> Section 1.2, 1.3 – Added <br/> Section 2 – Moved as standalone chapter from section <br/> Section 6.2.3 – Added In-app payment cloud cryptogram verification flow <br/> Section 7.12 – Added error codes ‘017’, ‘018’ and ‘019’ <br/> Section 7.15 – Editorial changes <br/> Section 7.18 – Added tags `10` (Device type) and `11` (Token type) as RFU <br/> Section 8.3.2 – Editorial changes <br/> Section 8.4 – Editorial changes <br/> Section 8.4.1 – Editorial changes <br/> Section 8.4.4 – Added ECB in MAC Key wrapping <br/> |
 | 2.6      | 06/02/2023 | Section 7.2 – Add transaction type code 36 <br/> Section 7.5 – Added new field 12 Date and time local transaction <br/> Section 7.19 – Added tags, 10, 11 and 12 <br/> Section 8.4 – Clearifications on MAC details <br/> Section 8.4 – Include new option for AES in MAC                                                                                                                                                                                                                                                                                                                     |                                                                                                                                                                                                                                                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | 2.7      | 07/08/2023 | Section 7.6 – Add support for unknown token expiry from processor <br/> Section 8.3 removed VPN section as it is not supported. <br/> Section 7.5 Clarification on field 12 <br/> Section 8.5 Details about health check <br/> Section 8.6 Corrected URL scheme <br/> unified dateformat in revision                                                                                                                                                                                                                                                                                          |                                                                                                                                                                                                                                                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| 2.8      | 07/08/2023 | Section 8.7 – Update examples with currently supported message format. <br/> Section 7.18 Move details about tags to appendix.                                                                                                                                                                                                                                                                                                                                                                                                                                                                |                                                                                                                                                                                                                                                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 
 # 1 Introduction
 
@@ -754,11 +755,11 @@ Interface messages.
 
 ## 7.18 Field n° 55 – Chip Related Data
 
-|                 |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-|-----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Attribute**   | LLLVAR b…255                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| **Description** | Contains data related to ICC systems related to the card.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| **Values**      | The data element value field is BER-TLV structured as defined in EMV specifications Book 3. <br/> The following table provides the list of mandatory data elements that must be present in field 55 when present in the 1100 ISO message: <br/> <table> <tr> <th>Tag</th> <th>Length</th> <th>Data element</th> </tr> <tr> <td>‘5F2A’</td> <td>2</td> <td>Transaction Currency Code</td> </tr> <tr> <td>‘82’</td> <td>2</td> <td>Application Interchange Profile</td> </tr> <tr> <td>‘95’</td> <td>5</td> <td>Terminal Verification Result</td> </tr> <tr> <td>'9A'</td> <td>3</td> <td>Transaction Date</td> </tr> <tr> <td>‘9C’</td> <td>1</td> <td>Transaction Type</td> </tr> <tr> <td>‘9F02’</td> <td>6</td> <td>Authorized Amount</td> </tr> <tr> <td>‘9F03’ </td> <td>6</td> <td>Other Amount (Default value ‘000000000000’ when the remote host ignores its value))</td> </tr> <tr> <td>‘9F10’</td> <td>Variable up to 32</td> <td>Issuer Application Data</td> </tr> <tr> <td>‘9F1A’</td> <td>2</td> <td>Terminal Country Code</td> </tr> <tr> <td>‘9F26’</td> <td>8</td> <td>Application Cryptogram</td> </tr> <tr> <td>‘9F27’</td> <td>1</td> <td>Cryptogram Information Data</td> </tr> <tr> <td>‘9F36’</td> <td>2</td> <td>Application Transaction Counter</td> </tr> <tr> <td>‘9F37’ </td> <td>4</td> <td>Unpredictable Number</td> </tr> </table> Additional data elements may be present. <br/> The following table provides the list of data elements that are present in field 55 when present in the 1130 ISO message: <br/> <table> <tr> <th>Tag</th> <th>Length</th> <th>Data Element</th></tr> <tr> <td>'91'</td> <td>Variable up to 16</td> <td>Issuer Authentication Data (containing the ARPC cryptogram)</td> </tr> </table> <br/> Note: The field 55 is present in the 1130 ISO message only when PAN Entry Mode in POS Entry Mode is equal to “04: PAN read in contact chip”. <br/> The structure of each of mandatory data element is defined in the EMV specifications Book 3. <br/> Example of field 55: <br/> 69 (length = 105 dec) <br/> 69 9f 02 06 00 00 00 00 21 00 9f 03 06 00 00 00 00 00 00 9f 1a 02 <br/> 02 50 95 05 00 00 00 00 00 5f 2a 02 09 78 9a 03 18 01 09 9c 01 00 <br/> 9f 37 04 0f 01 0e 03 82 02 1a 80 9f 36 02 00 01 9f 10 20 0f a5 01 <br/> a0 81 01 00 00 ee af 28 c6 83 81 c2 ed 0f 00 00 00 00 00 00 00 00 <br/> 00 00 00 00 00 00 00 9f 26 08 a1 a7 17 06 5f f0 30 a3 |
+|                 |                                                                                               |
+|-----------------|-----------------------------------------------------------------------------------------------|
+| **Attribute**   | LLLVAR b…255                                                                                  |
+| **Description** | Contains data related to ICC systems related to the card.                                     |
+| **Values**      | The data element value field is BER-TLV structured as defined in EMV specifications Book 3.   |
 
 ## 7.19 Field n° 56 – Token Related Data
 
@@ -978,100 +979,197 @@ URL is formatted as below, the actual URL will be provided:
 
 ## 8.7 ISO8583 request/response examples
 
+The following examples illustrate the ISO8583 request/response messages that are exchanged between the remote host and the Cloud TSP.
+
 ### Detokenization Request:
 
-```
-----BEGIN ISO MESSAGE-----
-MTI : 1100
-BitMap : {2, 3, 4, 7, 14, 18, 19, 22, 23, 37, 42, 43, 48, 49, 55, 64}
-Field-2 : [603200*******1961]               (PAN - PRIMARY ACCOUNT NUMBER)
-Field-3 : [000000]                          (PROCESSING CODE)
-Field-4 : [000000002100]                    (AMOUNT, TRANSACTION)
-Field-7 : [1017684135]                      (TRANSMISSION DATE AND TIME)
-Field-14 : [2809]                           (DATE, EXPIRATION)
-Field-18 : [1520]                           (MERCHANTS TYPE)
-Field-19 : [250]                            (ACQUIRING INSTITUTION COUNTRY CODE)
-Field-22 : [000]                            (POINT OF SERVICE ENTRY MODE)
-Field-23 : [000]                            (CARD SEQUENCE NUMBER)
-Field-37 : [539053756313]                   (RETRIEVAL REFERENCE NUMBER)
-Field-42 : [4992 ]                          (CARD ACCEPTOR IDENTIFICATION CODE)
-Field-43 : [BAX Test / /Paris /FR ]         (CARD ACCEPTOR NAME/LOCATION)
-Field-48 : [00100210002032A9B4A1883D21FA3E19DBCDF174EB06B000501211AA22BB33CC] (ADITIONAL DATA - PRIVATE)
-Field-49 : [978]                            (CURRENCY CODE, TRANSACTION)
-Field-55 : [9F02060000000021009F03060000000000009F1A020250950500000000005F2A0209789A031801099C01009F37040F010E0382021A809F360200019F10200FA501A081010000F010A0FA8E8527130F0000000000000000000000000000009F2608F8F415E88CF69EF8] (IC card system related data)
-Field-64 : [FA71C3422A48D361]               (MESSAGE AUTHENTICATION CODE FIELD)
-----END ISO MESSAGE-----
-```
+A detokenization request is sent by the remote host to the Cloud TSP to retrieve the PAN from a token. The example is
+has a 2KEY 3DES MAC key and uses SHA-256 hash for the MAC computation. Field-55 is from a PURE wallet.
+
+#### HTTP dump
 
 ```
-b64Iso=[EQByBGYACGGCAREGAyABBIYgGWEAAAAAAAAAIQAQF2hBNSgJFSACUAAAAAA1M
-zkwNTM3NTYzMTM0OTkyICAgICAgICAgICBCQVggVGVzdCAgICAgICAgICAgICAgLyAgICAgL1Bh
-cmlzICAgICAgICAgICAgICAgICAvRlIgQDAwMTAwMjEwMDAyMDMyQTlCNEExODgzRDIxRkEzRT
-E5REJDREYxNzRFQjA2QjAwMDUwMTIxMUFBMjJCQjMzQ0MJeGmfAgYAAAAAIQCfAwYAAAAA
-AACfGgICUJUFAAAAAABfKgIJeJoDGAEJnAEAnzcEDwEOA4ICGoCfNgIAAZ8QIA+lAaCBAQAA8B
-Cg+o6FJxMPAAAAAAAAAAAAAAAAAAAAnyYI+PQV6Iz2nvj6ccNCKkjTYQ==]
+POST /gtotx/api/iso/stoepay/v10/msg/stoepay HTTP/1.1
+Host: ctsp-proc-pp.baxlab.no:443
+Accept: */*
+TID: 001cb3dc-b2f6-4c71-a0c4-53ed96799109
+header: 41000000
+Content-Type: text/plain
+Content-Length: 412
+
+EQByBGYACGGCAREGAyABBIYgGWEAAAAAAAAAIQAGBQYBQygJFSACUAAAAAA3NjM0MDgzMjQyMjM0OTkyICAgICAgICAgICBCQVggVGVzdCAgICAgICAgICAgICAgLyAgICAgL1BhcmlzICAgICAgICAgICAgICAgICAvRlIgQDAwMTAwMjExMDAyMDMyRTU0MTIxQTBCQTVBQkM1NjVFOEYzRTYyNUU2Q0VGRTAwMDUwMTIxMUFBMjJCQjMzQ0MJeGmfAgYAAAAAIQCfAwYAAAAAAACfGgICUJUFAAAAAABfKgIJeJoDGAEJnAEAnzcEDwEOA4ICGoCfNgIAAZ8QIA+lAaCBAQAA8BCg+o6FJxMPAAAAAAAAAAAAAAAAAAAAnyYI+PQV6Iz2nvgIZxuvDPXbRg==
 ```
+
+#### Fields specification
+
+| Field      | Value                                                                                                                                                                                                                                                                                                                                            | Description                        |
+|------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------|
+| MTI        | 1100                                                                                                                                                                                                                                                                                                                                             |                                    |
+| BitMap     | {2, 3, 4, 7, 14, 18, 19, 22, 23, 37, 42, 43, 48, 49, 55, 64}                                                                                                                                                                                                                                                                                     |                                    |
+| Field-2    | 603200\*\*\*\*\*\*\*\*1961                                                                                                                                                                                                                                                                                                                       | PAN - PRIMARY ACCOUNT NUMBER       |
+| Field-3    | 000000                                                                                                                                                                                                                                                                                                                                           | PROCESSING CODE                    |
+| Field-4    | 000000002100                                                                                                                                                                                                                                                                                                                                     | AMOUNT, TRANSACTION                |
+| Field-7    | 0605060143                                                                                                                                                                                                                                                                                                                                       | TRANSMISSION DATE AND TIME         |
+| Field-14   | 2809                                                                                                                                                                                                                                                                                                                                             | DATE, EXPIRATION                   |
+| Field-18   | 1520                                                                                                                                                                                                                                                                                                                                             | MERCHANTS TYPE                     |
+| Field-19   | 250                                                                                                                                                                                                                                                                                                                                              | ACQUIRING INSTITUTION COUNTRY CODE |
+| Field-22   | 000                                                                                                                                                                                                                                                                                                                                              | POINT OF SERVICE ENTRY MODE        |
+| Field-23   | 000                                                                                                                                                                                                                                                                                                                                              | CARD SEQUENCE NUMBER               |
+| Field-37   | 763408324223                                                                                                                                                                                                                                                                                                                                     | RETRIEVAL REFERENCE NUMBER         |
+| Field-42   | 4992&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                                                                                                                                                                                                                                                               | CARD ACCEPTOR IDENTIFICATION CODE  |
+| Field-43   | BAX Test&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/Paris&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/FR | CARD ACCEPTOR NAME/LOCATION        |
+| Field-48   | 00100211002032E54121A0BA5ABC565E8F3E625E6CEFE000501211AA22BB33CC                                                                                                                                                                                                                                                                                 | ADDITIONAL DATA - PRIVATE          |
+| Field-49   | 978                                                                                                                                                                                                                                                                                                                                              | CURRENCY CODE, TRANSACTION         |
+| Field-55   | 9F02060000000021009F03060000000000009F1A020250950500000000005F2A0209789A031801099C01009F37040F010E0382021A809F360200019F10200FA501A081010000F010A0FA8E8527130F0000000000000000000000000000009F2608F8F415E88CF69EF8                                                                                                                               | IC card system related data        |
+| Field-64   | 08671BAF0CF5DB46                                                                                                                                                                                                                                                                                                                                 | MESSAGE AUTHENTICATION CODE FIELD  |
+
 
 ### Detokenization response:
 
-```
-----BEGIN ISO MESSAGE-----
-MTI : 1110
-BitMap : {2, 14, 39, 48, 56, 64}
-Field-2 : [500050*******0053]               (PAN - PRIMARY ACCOUNT NUMBER)
-Field-14 : [2303]                           (DATE, EXPIRATION)
-Field-39 : [000]                            (ACTION CODE)
-Field-48 : [00100210002032A9B4A1883D21FA3E19DBCDF174EB06B0] (ADITIONAL DATA - PRIVATE)
-Field-56 : [0505434C4F5544060753504159484345] Field-64 : [BA0E969272027185] (Token Related Data) (MESSAGE AUTHENTICATION CODE FIELD)
-----END ISO MESSAGE-----
-```
+The response is successful and contains the PAN in Field-2. The MAC is computed using SHA-256 hash and 2KEY 3DES MAC key.
+
+#### HTTP dump
 
 ```
-b64Iso=[ERBABAAAAgEBAREFAAUAFWAAAFMjAwAALjAwMTAwMjEwMDAyMDMyQTlCNEExODgzRDIxRkEzRTE5REJDREYxNzRFQjA2QjAQBQVDTE9VRAYHU1BBWUhDRboOlpJyAnGF]
+HTTP/1.1 200 OK
+TID: 001cb3dc-b2f6-4c71-a0c4-53ed96799109
+header: 41000000
+Content-Type: text/plain
+Content-Length: 120
+Date: Thu, 05 Jun 2025 06:01:44 GMT
+Keep-Alive: timeout=20
+Connection: keep-alive
+
+ERBABAAAAgEBAREFAAUAFWAAAFMnBAAALjAwMTAwMjExMDAyMDMyQ0NDQjk2MjE3ODQ4NTU5RkI1RjdFRUZDMjA4NjEzNUEJBgdTUEFZSENFFhQCxLmfVUI=
 ```
+
+| Field      | Value                                          | Description                        |
+|------------|------------------------------------------------|------------------------------------|
+| MTI        | 1110                                           |                                    |
+| Field-2    | 500050\*\*\*\*\*\*\*\*0053                     | PAN - PRIMARY ACCOUNT NUMBER       |
+| Field-14   | 2704                                           | DATE, EXPIRATION                   |
+| Field-39   | 000                                            | ACTION CODE                        |
+| Field-48   | 00100211002032CCCB96217848559FB5F7EEFC2086135A | ADDITIONAL DATA - PRIVATE          |
+| Field-56   | 060753504159484345                             | Token Related Data                 |
+| Field-64   | 161402C4B99F5542                               | MESSAGE AUTHENTICATION CODE FIELD  |
+
 
 ### Advice request:
 
-```
-----BEGIN ISO MESSAGE-----
-MTI : 1120
-Field-2 : [500050*******0053]               (PAN - PRIMARY ACCOUNT NUMBER)
-Field-3 : [000000]                          (PROCESSING CODE)
-Field-4 : [000000000100]                    (AMOUNT, TRANSACTION)
-Field-7 : [1017684135]                      (TRANSMISSION DATE AND TIME)
-Field-14 : [2303]                           (DATE, EXPIRATION)
-Field-18 : [1520]                           (MERCHANTS TYPE)
-Field-19 : [250]                            (ACQUIRING INSTITUTION COUNTRY CODE)
-Field-22 : [000]                            (POINT OF SERVICE ENTRY MODE)
-Field-23 : [001]                            (CARD SEQUENCE NUMBER)
-Field-37 : [539053756313]                   (RETRIEVAL REFERENCE NUMBER)
-Field-39 : [000]                            (ACTION CODE)
-Field-42 : [4992 ]                          (CARD ACCEPTOR IDENTIFICATION CODE)
-Field-43 : [BAX Test / /Paris /FR ]         (CARD ACCEPTOR NAME/LOCATION)
-Field-48 : [00100210002032A9B4A1883D21FA3E19DBCDF174EB06B000501211AA22BB33CC] (ADITIONAL DATA - PRIVATE)
-Field-49 : [978]                            (CURRENCY CODE, TRANSACTION)
-Field-64 : [CD643CE4CE197782]               (MESSAGE AUTHENTICATION CODE FIELD)
-----END ISO MESSAGE-----
-```
+The advice request is sent to notify the wallet about the detokenization result. Field 2 contains the PAN, field-39
+contains the result of the detokenization.
+
+#### HTTP dump
 
 ```
-b64Iso=[ESByBGYACmGAAREFAAUAFWAAAFMAAAAAAAAAAQAQF2hBNSMDFSACUAAAAAE1MzkwNTM3NTYzMTMAADQ5OTIgICAgICAgICAgIEJBWCBUZXN0ICAgICAgICAgICAgICAvICAgICAvUGFyaXMgICAgICAgICAgICAgICAgIC9GUiBAMDAxMDAyMTAwMDIwMzJBOUI0QTE4ODNEMjFGQTNFMTlEQkNERjE3NEVCMDZCMDAwNTAxMjExQUEyMkJCMzNDQwl4zWQ85M4Zd4I=]
+POST /gtotx/api/iso/stoepay/v10/msg/stoepay HTTP/1.1
+Host: ctsp-proc-pp.baxlab.no:443
+Accept: text/plain, text/*
+TID: 88a1a721-a3dc-4502-a340-435c4e6a8064
+header: 41000000
+Content-Type: text/html
+Content-Length: 272
+
+ESByBGYACmGAAREFAAUAFWAAAFMAAAAAAAAAAQAGBQhDJScEFSACUAAAAAE2MDg2NzE5ODA2NDIAADQ5OTIgICAgICAgICAgIEJBWCBUZXN0ICAgICAgICAgICAgICAvICAgICAvUGFyaXMgICAgICAgICAgICAgICAgIC9GUiBAMDAxMDAyMTEwMDIwMzI4QTdGMzUyRjg2QjNGM0QyNDg2REIxRDdCNzM1MDgwQTAwNTAxMjExQUEyMkJCMzNDQwl4RU0U+Glc5dI=
+
 ```
+
+#### Fields specification
+
+| Field     | Value                                                                                                                                                                                                                                                                                                                                            | Description                        |
+|-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------|
+| MTI       | 1120                                                                                                                                                                                                                                                                                                                                             |                                    |
+| BitMap    | {2, 3, 4, 7, 14, 18, 19, 22, 23, 37, 39, 42, 43, 48, 49, 64}                                                                                                                                                                                                                                                                                     |                                    |
+| Field-2   | 500050\*\*\*\*\*\*\*\*0053                                                                                                                                                                                                                                                                                                                       | PAN - PRIMARY ACCOUNT NUMBER       |
+| Field-3   | 000000                                                                                                                                                                                                                                                                                                                                           | PROCESSING CODE                    |
+| Field-4   | 000000000100                                                                                                                                                                                                                                                                                                                                     | AMOUNT, TRANSACTION                |
+| Field-7   | 0605084325                                                                                                                                                                                                                                                                                                                                       | TRANSMISSION DATE AND TIME         |
+| Field-14  | 2704                                                                                                                                                                                                                                                                                                                                             | DATE, EXPIRATION                   |
+| Field-18  | 1520                                                                                                                                                                                                                                                                                                                                             | MERCHANTS TYPE                     |
+| Field-19  | 250                                                                                                                                                                                                                                                                                                                                              | ACQUIRING INSTITUTION COUNTRY CODE |
+| Field-22  | 000                                                                                                                                                                                                                                                                                                                                              | POINT OF SERVICE ENTRY MODE        |
+| Field-23  | 001                                                                                                                                                                                                                                                                                                                                              | CARD SEQUENCE NUMBER               |
+| Field-37  | 608671980642                                                                                                                                                                                                                                                                                                                                     | RETRIEVAL REFERENCE NUMBER         |
+| Field-39  | 000                                                                                                                                                                                                                                                                                                                                              | ACTION CODE                        |
+| Field-42  | 4992&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                                                                                                                                                                                                                                                               | CARD ACCEPTOR IDENTIFICATION CODE  |
+| Field-43  | BAX Test&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/Paris&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/FR | CARD ACCEPTOR NAME/LOCATION        |
+| Field-48  | 001002110020328A7F352F86B3F3D2486DB1D7B735080A00501211AA22BB33CC                                                                                                                                                                                                                                                                                 | ADDITIONAL DATA - PRIVATE          |
+| Field-49  | 978                                                                                                                                                                                                                                                                                                                                              | CURRENCY CODE, TRANSACTION         |
+| Field-64  | 454D14F8695CE5D2                                                                                                                                                                                                                                                                                                                                 | MESSAGE AUTHENTICATION CODE FIELD  |
 
 ### Advice response:
 
-```
-----BEGIN ISO MESSAGE-----
-MTI : 1130
-BitMap : {2, 14, 39, 48, 64}
-Field-2 : [603200*******1961]               (PAN - PRIMARY ACCOUNT NUMBER)
-Field-14 : [2809]                           (DATE, EXPIRATION)
-Field-39 : [000]                            (ACTION CODE)
-Field-48 : [00100210002032A9B4A1883D21FA3E19DBCDF174EB06B0] (ADITIONAL DATA - PRIVATE)
-Field-64 : [42648CBBCC0A7E61]               (MESSAGE AUTHENTICATION CODE FIELD)
-----END ISO MESSAGE-----
-```
+The advice response contains the token pan in field-2.
+
+#### HTTP dump
 
 ```
-b64Iso=[ETBABAAAAgEAAREGAyABBIYgGWEoCQAALjAwMTAwMjEwMDAyMDMyQTlCNEExODgzRDIxRkEzRTE5REJDREYxNzRFQjA2QjBCZIy7zAp+YQ==]
+HTTP/1.1 200 OK
+TID: 001cb3dc-b2f6-4c71-a0c4-53ed96799109
+header: 41000000
+Content-Type: text/plain
+Content-Length: 120
+Date: Thu, 05 Jun 2025 06:01:44 GMT
+Keep-Alive: timeout=20
+Connection: keep-alive
+
+ERBABAAAAgEBAREFAAUAFWAAAFMnBAAALjAwMTAwMjExMDAyMDMyQTA2QTUwNjFDQkI5RjE1RTE1Nzg4MEM0MDkzQ0YzNzQJBgdTUEFZSENF1kvCKDWu060=
+
 ```
+## 8.4 Field 55 Example
+
+Field 55 contains the data elements related to the Integrated Circuit Card (ICC). The contents of the fields is a series
+of tags created by the merchant POS typically. It is formatted as a BER-TLV structure, with various tags depending on
+the payment kernel used. The tags are defined in the EMV specifications Book 3.
+
+In the Cloud TSP ISO API, the main usage of field 55 is to verify the application cryptogram, to authenticate the
+request. The ISO API will not reject requests with additional tags, but the minimum set of tags, depending on the
+payment kernel in use, must be present.
+
+### PURE
+
+The following table provides the list of mandatory data elements that must be present in field 55 when present in the 1100 ISO message:
+
+| Tag     | Length            | Data element                                                                                   |
+|---------|-------------------|-----------------------------------------------------------------------------------------------|
+| 5F2A    | 2                 | Transaction Currency Code                                                                     |
+| 82      | 2                 | Application Interchange Profile                                                               |
+| 95      | 5                 | Terminal Verification Result                                                                  |
+| 9A      | 3                 | Transaction Date                                                                              |
+| 9C      | 1                 | Transaction Type                                                                              |
+| 9F02    | 6                 | Authorized Amount                                                                             |
+| 9F03    | 6                 | Other Amount (Default value `000000000000` when the remote host ignores its value)           |
+| 9F10    | Variable up to 32 | Issuer Application Data                                                                       |
+| 9F1A    | 2                 | Terminal Country Code                                                                         |
+| 9F26    | 8                 | Application Cryptogram                                                                        |
+| 9F27    | 1                 | Cryptogram Information Data                                                                   |
+| 9F36    | 2                 | Application Transaction Counter                                                               |
+| 9F37    | 4                 | Unpredictable Number                                                                          |
+
+Remember to check the specifications for the wallet in use. This is an example for reference only.
+
+Additional data elements may be present. The following table provides the list of data elements that are present in field 55 when present in the 1130 ISO message:
+
+| Tag  | Length              | Data Element                                                 |
+|------|---------------------|--------------------------------------------------------------|
+| `91` | Variable up to 16   | Issuer Authentication Data (containing the ARPC cryptogram)  |
+
+Note: The field 55 is present in the 1130 ISO message only when PAN Entry Mode in POS Entry Mode is equal to “04: PAN read in contact chip”.
+
+The structure of each of mandatory data element is defined in the EMV specifications Book 3.
+
+Example of field 55:
+
+```
+69 (length = 105 dec)
+69 9f 02 06 00 00 00 00 21 00 9f 03 06 00 00 00 00 00 00 9f 1a 02 <br/> 02 50 95 05 00 00 00 00 00 5f 2a 02 09 78 9a 03 18 01 09 9c 01 00 <br/> 9f 37 04 0f 01 0e 03 82 02 1a 80 9f 36 02 00 01 9f 10 20 0f a5 01 <br/> a0 81 01 00 00 ee af 28 c6 83 81 c2 ed 0f 00 00 00 00 00 00 00 00 <br/> 00 00 00 00 00 00 00 9f 26 08 a1 a7 17 06 5f f0 30 a3
+```
+
+| Field     | Value                                          | Description                        |
+|-----------|------------------------------------------------|------------------------------------|
+| MTI       | 1130                                           |                                    |
+| Field-2   | 603200\*\*\*\*\*\*\*\*1961                     | PAN - PRIMARY ACCOUNT NUMBER       |
+| Field-14  | 2809                                           | DATE, EXPIRATION                   |
+| Field-39  | 000                                            | ACTION CODE                        |
+| Field-48  | 00100211002032BD4E0A1DAAA47C25CB1EF6CA107DBECA | ADDITIONAL DATA - PRIVATE          |
+| Field-64  | 729A79DB1D60F465                               | MESSAGE AUTHENTICATION CODE FIELD  |

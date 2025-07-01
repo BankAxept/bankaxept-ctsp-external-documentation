@@ -1,4 +1,4 @@
 Welcome to BankAxept's documentation.
 
-* [Getting Started with BankAxept CTSP Platform](./getting_started.md)
-* [CTSP API](./swagger/ctsp-token-api)
+* [Getting Started with STØ Token Service](./getting_started.md)
+* [STØ Token Service ISO API](./TSP_ISO_Message.md)

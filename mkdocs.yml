@@ -14,12 +14,12 @@ nav:
   - Documentation:
       - Introduction: getting_started.md
       - Onboarding: onboarding.md
-      - Tokenization flows:
-          - Epayment: tokenization.md
       - Resources:
-          - API Policy: api_policy.md
-  - API Specs:
-      - BankAxept CTSP Integrator API: swagger/ctsp-token-api.md
+          - STØ Token Service ISO API v2.8 current: TSP_ISO_Message.md
+          - STØ Token Service ISO API v2.7: TSP_ISO_Message_V2.7.md
+          - STØ Token Service ISO API v2.6: TSP_ISO_Message_V2.6.md
+          - STØ Token Service ISO API v2.5: TSP_ISO_Message_V2.5.md
+
 extra_javascript:
   - https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js
   - https://unpkg.com/swagger-ui-dist@3/swagger-ui-bundle.js

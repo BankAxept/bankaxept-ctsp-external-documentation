@@ -1,6 +1,6 @@
 # Onboarding
 
-This page describes all steps required to start utilizing Cloud TSP APIs. It includes a checklist of all necessary steps
+This page describes all steps required to start utilizing STØ Token Service APIs. It includes a checklist of all necessary steps
 and requirements, as well as a description of why they are required.
 
 There are two environments available: preproduction and production. The preproduction environment is used for testing
@@ -30,11 +30,3 @@ in the source IP needs to be communicated to BankAxept.
 
 A certificate signing request (CSR) needs to be provided to the Cloud TSP support team. Once the CSR is received, the
 support team will generate a certificate. This will be used to enable secure connectivity to the APIs.
-
-### Connectivity test
-
-The connectivity test is used to verify that the connectivity between the integrator and BankAxept is working as
-expected. The test is performed by the integrator with support by the Cloud TSP support team. An HTTP request, from
-BankAxept. The health check endpoint URL is: `https://api.bankaxept.com/health-check`.
-
-By verifying that the health check can be called successfully, the connectivity is considered to be working.

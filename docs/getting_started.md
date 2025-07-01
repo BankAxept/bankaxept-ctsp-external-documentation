@@ -2,8 +2,7 @@
 <img alt="BankAxept_Logo.svg" src="../assets/images/bankaxept_logo.svg" width="300"/>
 </p>
 
-> Welcome to the Getting Started guide for the BankAxept
-> CTSP functionality.
+> Welcome to the Getting Started guide for the STØ Token Service.
 >
 > This text is intended to give both clear descriptions and
 > guidance for integrators and consumers of CTSP. It includes an
@@ -12,8 +11,8 @@
 
 # Introduction
 
-CTSP (Cloud Token Service Provider) is a Tokenization and Life Cycle Management (LCM) system delivered by BankAxept.
-The intention of this documentation is to describe message exchanges
+STØ Token Service, a SaaS TSP (Token Service Provider), offers fast, secure and reliable Tokenization including Life Cycle Management (LCM), detokenization and notification.
+This documentation describes the connectivity, message exchanges and cryptography required to use the service.
 
 ## Setting up your CTSP integration
 

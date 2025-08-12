@@ -1116,7 +1116,7 @@ Connection: keep-alive
 ERBABAAAAgEBAREFAAUAFWAAAFMnBAAALjAwMTAwMjExMDAyMDMyQTA2QTUwNjFDQkI5RjE1RTE1Nzg4MEM0MDkzQ0YzNzQJBgdTUEFZSENF1kvCKDWu060=
 
 ```
-## 8.4 Field 55 Example
+## 8.8 Field 55 Example
 
 Field 55 contains the data elements related to the Integrated Circuit Card (ICC). The contents of the fields is a series
 of tags created by the merchant POS typically. It is formatted as a BER-TLV structure, with various tags depending on

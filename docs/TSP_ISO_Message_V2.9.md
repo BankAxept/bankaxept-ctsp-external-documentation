@@ -50,14 +50,13 @@ Copyright © 202 1 Thales .
     - [TLS Authentication](#831-tls-authentication-https)
     - [MAC usage](#832-mac-usage)
   - [MAC Details](#84-mac-details)
-    - [Message transformations](#841-message-transformations)
-    - [MAC Algorithm](#842-mac-algorithms)
-    - [MAC key protection alternatives](#843-mac-key-protection-alternatives)
-    - [Key Interchange](#844-key-interchange)
-    - [MAC key](#845-mac-key)
-    - [MAC](#846-mac)
-    - [Keys type and algorithms – 3DES](#847-keys-type-and-algorithms---3des)
-    - [Keys type and algorithms – AES](#848-keys-type-and-algorithms---aes)
+    - [MAC KEK](#841-mac-kek)
+    - [MAC session key](#842-mac-session-key)
+    - [MAC](#843-mac)
+    - [Message transformation](#844-message-transformations)
+    - [MAC algorithms](#845-mac-algorithms)
+    - [Key types and algorithms - 3DES](#846-key-types-and-algorithms---3des-note-3des-not-supported-for-new-projects)
+    - [Keys type and algorithms – AES](#847-key-types-and-algorithms---aes)
   - [Healthcheck Interface](#85-healthcheck-interface)
   - [ISO interface](#86-iso-interface)
   - [ISO8583 request/response examples](#87-iso8583-requestresponse-examples)
@@ -92,7 +91,7 @@ Table 4 - FIELDS PRESENCE IN ISO MESSAGES
 | 2.6      | 06/02/2023 | Section 7.2 – Add transaction type code 36 <br/> Section 7.5 – Added new field 12 Date and time local transaction <br/> Section 7.19 – Added tags, 10, 11 and 12 <br/> Section 8.4 – Clearifications on MAC details <br/> Section 8.4 – Include new option for AES in MAC                                                                                                                                                                                                                                                                                                                     |                                                                                                                                                                                                                                                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | 2.7      | 07/08/2023 | Section 7.6 – Add support for unknown token expiry from processor <br/> Section 8.3 removed VPN section as it is not supported. <br/> Section 7.5 Clarification on field 12 <br/> Section 8.5 Details about health check <br/> Section 8.6 Corrected URL scheme <br/> unified dateformat in revision                                                                                                                                                                                                                                                                                          |                                                                                                                                                                                                                                                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | 2.8      | 07/08/2023 | Section 8.7 – Update examples with currently supported message format. <br/> Section 7.18 Move details about tags to appendix.                                                                                                                                                                                                                                                                                                                                                                                                                                                                |                                                                                                                                                                                                                                                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| 2.9      | 07/08/2023 |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |                                                                                                                                                                                                                                                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| 2.9      | 13/08/2025 | Section 8.4 - Improved MAC documentation. <br/> Section 8.7 Include examples of AES CMAC                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 
 # 1 Introduction
 
@@ -850,14 +849,37 @@ Usage of MAC is required in all ISO Message (Request and Response). See MAC deta
 
 ## 8.4 MAC details
 
-The following principles shall be applied:
-* All ISO messages are protected using a MAC.
-* A new MAC key is generated for each ISO Message.
-* The MAC key is protected using a Encryption key (Key Interchange)
-* Key Interchange will be exchanged between each party encrypted under a ZMK
-* The ZMK (Zone Master Key) are exchanged during a key ceremony and imported into HSM.
+Prerequisites for MAC usage:
+* A ZMK (Zone Master Key) has been exchanged between the parties during a key ceremony and imported into HSM.
+* A MAC key encryption key (MAC KEK) has subsequently been generated and securely exchanged, encrypted under the ZMK.
 
-### 8.4.1 Message transformations
+The following principles shall be applied for all ISO messages:
+* All ISO messages are protected using MAC.
+* All ISO messages should contain a MAC session key.
+* The MAC session key is protected under the MAC KEK.
+
+### 8.4.1 MAC KEK
+
+The MAC KEK serves as the cryptographic key responsible for encrypting the MAC session key.
+During the setup phase, the MAC KEK must be securely exchanged between the parties, protected under the ZMK.
+Additionally, HSM is mandatory for the protection of MAC KEKs.
+Its cryptographic period is defined as either a maximum length of time or a maximum number of transactions, whichever is reached first.
+Upon the expiration of the cryptographic period, the MAC KEK must be renewed.
+The MAC KEK is identified by a key index (ranging from 1 to 255) to allow for key renewal. The key index is present in the ISO Message in Field n° 48 – Additional data, private (Identifier “001”, the encrypted key index).
+
+### 8.4.2 MAC session key
+
+The MAC session key is an ephemeral key used to calculate the MAC.
+The MAC session key, encrypted under the MAC KEK, shall be present in each ISO message, located in Field n° 48 – Additional data, private (Identifier "002", the MAC key).
+The MAC session key is generated by each party and can be reused in multiple ISO messages. The maximum recommended lifetime for an ephemeral MAC session key is one hour.
+
+### 8.4.3 MAC
+
+MAC shall be computed for each ISO Message and put in Field n° 64 – Message Authentication Code.
+Input data to calculate the MAC is the hash of the full ISO payload encoded to bytes excluding the mac value field (Field 64).
+**Note:** SHA-256 hash is used by default. SHA-1 hash can be used under request.
+
+### 8.4.4 Message transformations
 
 The transformation is applied to the message and the output from the transformation is input to the
 MAC algorithm. The following transformations are supported:
@@ -866,63 +888,37 @@ MAC algorithm. The following transformations are supported:
 * SHA-256
 * None
 
-### 8.4.2 MAC algorithms
+### 8.4.5 MAC algorithms
 
 The following algorithms are supported:
 
 * ISO 9797 algorithm 3 (3DES)
 * CMAC (AES)
 
-### 8.4.3 MAC key protection alternatives
 
-Currently there is support for two key interchange alternatives
 
-* Triple DES CBC no-padding
-* Triple DES ECB no-padding
-* AES CBC no-padding
-* AES ECB no-padding
 
-### 8.4.4 Key Interchange
+### 8.4.6 Key types and algorithms - 3DES (Note: 3DES not supported for new projects)
 
-KI (Key Interchange) is the encrypted key used to encrypt the ephemeral MAC Key
-KI shall be exchanged between the parties during the setup phase.
-KI are exchanged encrypted under ZMK and shall be protected by HSM.
-KI is identifed by a key index (1 to 255) and allow Key Interchange switchover (key renewal)
-Key index is present in ISO Message in Field n° 48 – Additional data, private (Identifier "001", the encrypted key index)
+|                          |                                                                                                                                                                                                                                                                                    |
+|--------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| MAC KEK Key Type         | "3 key" 3DES (size 24 bytes) or <br/>  "2 key" 3DES (size 16 bytes) (*)                                                                                                                                                                                                            |
+| MAC session key Key Type | "2 key" 3DES (size 16 bytes)                                                                                                                                                                                                                                                       |
+| MAC Key wrapping         | 3DES using ECB                                                                                                                                                                                                                                                                     |
+| MAC                      | MAC Algorithm 3 (ISO 9797-1 Algorithm 3). Padding method 1 is used: input data is completed with `0`s until the data reaches a multiple of 8-byte blocks. No `0` is added if the input is already a multiple of 8-byte blocks. <br/> The MAC is the 8 leftmost bytes of the output |
+(*) MAC KEK key length depends to remote Host capability
 
-### 8.4.5 MAC key
+### 8.4.7 Key types and algorithms - AES
 
-A MAC key shall be present in each ISO message, encrypted under KI in Field n° 48 – Additional data, private (Identifier "002", the MAC key)
+|                          |                                                                                                                                     |
+|--------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| MAC KEK Key Type         | AES (128, 192 or 256 bits)                                                                                                          |
+| MAC session key Key Type | AES 128bits                                                                                                                         |
+| MAC Key wrapping         | AES in TR-31 key block                                                                                                              |
+| MAC                      | AES-CMAC Algorithm (RFC 4493), with padding as defined in the AES-CMAC specification The MAC is the 8 leftmost bytes of the output. |
 
-The MAC key is an ephemeral key to be generated by each party and could be reuse in several ISO Messages.
 
-The maximum lifetime recommendation for an ephemeral MAC key is 1 hour.
 
-### 8.4.6 MAC
-
-MAC shall be computed for each ISO Message.
-MAC is present in Field n° 64 – Message Authentication Code
-Input data of the MAC is SHA-256 hash of the full ISO payload encoded to bytes excluding the mac value field (Field 64).
-**Note:** SHA-256 hash is used by default. SHA-1 hash can be used under request.
-
-### 8.4.7 Keys type and algorithms - 3DES
-
-|                  |                                                                                                                                                                                                                                                                                    |
-|------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| KI Key Type      | "3 key" 3DES (size 24 bytes) <br/> or "2" 3DES (size 16 bytes) (*)                                                                                                                                                                                                                 |
-| MAC Key Type     | "2 key" 3DES (size 16 bytes)                                                                                                                                                                                                                                                       |
-| MAC Key wrapping | 3DES using CBC or ECB                                                                                                                                                                                                                                                              |
-| MAC              | MAC Algorithm 3 (ISO 9797-1 Algorithm 3). Padding method 1 is used: input data is completed with `0`s until the data reaches a multiple of 8-byte blocks. No `0` is added if the input is already a multiple of 8-byte blocks. <br/> The MAC is the 8 leftmost bytes of the output |
-(*) KI Key length depends to remote Host capability
-
-### 8.4.8 Keys type and algorithms - AES
-
-|                  |                                                                                                                                     |
-|------------------|-------------------------------------------------------------------------------------------------------------------------------------|
-| KI Key Type      | AES (128, 192 or 256 bits)                                                                                                          |
-| MAC Key Type     | AES 128bits                                                                                                                         |
-| MAC Key wrapping | AES using CBC or ECB                                                                                                                |
-| MAC              | AES-CMAC Algorithm (RFC 4493), with padding as defined in the AES-CMAC specification The MAC is the 8 leftmost bytes of the output. |
 
 ## 8.5 Healthcheck interface
 
@@ -982,10 +978,12 @@ URL is formatted as below, the actual URL will be provided:
 
 The following examples illustrate the ISO8583 request/response messages that are exchanged between the remote host and the Cloud TSP.
 
+### 8.7.1 Detokenization using 3DES MAC
+
 ### Detokenization Request:
 
-A detokenization request is sent by the remote host to the Cloud TSP to retrieve the PAN from a token. The example is
-has a 2KEY 3DES MAC key and uses SHA-256 hash for the MAC computation. Field-55 is from a PURE wallet.
+A detokenization request is sent by the remote host to the Cloud TSP to retrieve the PAN from a token. This example calculates the MAC using
+a 2KEY 3DES MAC session key and SHA-256 hash for the message transformation. Field-55 is from a PURE wallet.
 
 #### HTTP dump
 
@@ -1021,13 +1019,14 @@ EQByBGYACGGCAREGAyABBIYgGWEAAAAAAAAAIQAGBQYBQygJFSACUAAAAAA3NjM0MDgzMjQyMjM0OTky
 | Field-43   | BAX Test&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/Paris&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/FR | CARD ACCEPTOR NAME/LOCATION        |
 | Field-48   | 00100211002032E54121A0BA5ABC565E8F3E625E6CEFE000501211AA22BB33CC                                                                                                                                                                                                                                                                                 | ADDITIONAL DATA - PRIVATE          |
 | Field-49   | 978                                                                                                                                                                                                                                                                                                                                              | CURRENCY CODE, TRANSACTION         |
-| Field-55   | 9F02060000000021009F03060000000000009F1A020250950500000000005F2A0209789A031801099C01009F37040F010E0382021A809F360200019F10200FA501A081010000F010A0FA8E8527130F0000000000000000000000000000009F2608F8F415E88CF69EF8                                                                                                                               | IC card system related data        |
+| Field-55   | 9F02060000000021009F03060000000000009F1A020250......00000000000000000000000000009F2608F8F415E88CF69EF8 (*)                                                                                                                                                                                                                                       | IC card system related data        |
 | Field-64   | 08671BAF0CF5DB46                                                                                                                                                                                                                                                                                                                                 | MESSAGE AUTHENTICATION CODE FIELD  |
-
+(*) Full field55: 9F02060000000021009F03060000000000009F1A020250950500000000005F2A0209789A031801099C01009F37040F010E0382021A809F360200019F10200FA501A081010000F010A0FA8E8527130F0000000000000000000000000000009F2608F8F415E88CF69EF8
 
 ### Detokenization response:
 
-The response is successful and contains the PAN in Field-2. The MAC is computed using SHA-256 hash and 2KEY 3DES MAC key.
+The response is successful and contains the PAN in Field-2. The MAC is computed using
+a 2KEY 3DES MAC session key and SHA-256 hash for the message transformation
 
 #### HTTP dump
 
@@ -1077,26 +1076,26 @@ ESByBGYACmGAAREFAAUAFWAAAFMAAAAAAAAAAQAGBQhDJScEFSACUAAAAAE2MDg2NzE5ODA2NDIAADQ5
 
 #### Fields specification
 
-| Field     | Value                                                                                                                                                                                                                                                                                                                                            | Description                        |
-|-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------|
-| MTI       | 1120                                                                                                                                                                                                                                                                                                                                             |                                    |
-| BitMap    | {2, 3, 4, 7, 14, 18, 19, 22, 23, 37, 39, 42, 43, 48, 49, 64}                                                                                                                                                                                                                                                                                     |                                    |
-| Field-2   | 500050\*\*\*\*\*\*\*\*0053                                                                                                                                                                                                                                                                                                                       | PAN - PRIMARY ACCOUNT NUMBER       |
-| Field-3   | 000000                                                                                                                                                                                                                                                                                                                                           | PROCESSING CODE                    |
-| Field-4   | 000000000100                                                                                                                                                                                                                                                                                                                                     | AMOUNT, TRANSACTION                |
-| Field-7   | 0605084325                                                                                                                                                                                                                                                                                                                                       | TRANSMISSION DATE AND TIME         |
-| Field-14  | 2704                                                                                                                                                                                                                                                                                                                                             | DATE, EXPIRATION                   |
-| Field-18  | 1520                                                                                                                                                                                                                                                                                                                                             | MERCHANTS TYPE                     |
-| Field-19  | 250                                                                                                                                                                                                                                                                                                                                              | ACQUIRING INSTITUTION COUNTRY CODE |
-| Field-22  | 000                                                                                                                                                                                                                                                                                                                                              | POINT OF SERVICE ENTRY MODE        |
-| Field-23  | 001                                                                                                                                                                                                                                                                                                                                              | CARD SEQUENCE NUMBER               |
-| Field-37  | 608671980642                                                                                                                                                                                                                                                                                                                                     | RETRIEVAL REFERENCE NUMBER         |
-| Field-39  | 000                                                                                                                                                                                                                                                                                                                                              | ACTION CODE                        |
-| Field-42  | 4992&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                                                                                                                                                                                                                                                               | CARD ACCEPTOR IDENTIFICATION CODE  |
-| Field-43  | BAX Test&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/Paris&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/FR | CARD ACCEPTOR NAME/LOCATION        |
-| Field-48  | 001002110020328A7F352F86B3F3D2486DB1D7B735080A00501211AA22BB33CC                                                                                                                                                                                                                                                                                 | ADDITIONAL DATA - PRIVATE          |
-| Field-49  | 978                                                                                                                                                                                                                                                                                                                                              | CURRENCY CODE, TRANSACTION         |
-| Field-64  | 454D14F8695CE5D2                                                                                                                                                                                                                                                                                                                                 | MESSAGE AUTHENTICATION CODE FIELD  |
+| Field     | Value                                                                                                                                                                                                                                                                                                                                                  | Description                        |
+|-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------|
+| MTI       | 1120                                                                                                                                                                                                                                                                                                                                                   |                                    |
+| BitMap    | {2, 3, 4, 7, 14, 18, 19, 22, 23, 37, 39, 42, 43, 48, 49, 64}                                                                                                                                                                                                                                                                                           |                                    |
+| Field-2   | 500050\*\*\*\*\*\*\*\*0053                                                                                                                                                                                                                                                                                                                             | PAN - PRIMARY ACCOUNT NUMBER       |
+| Field-3   | 000000                                                                                                                                                                                                                                                                                                                                                 | PROCESSING CODE                    |
+| Field-4   | 000000000100                                                                                                                                                                                                                                                                                                                                           | AMOUNT, TRANSACTION                |
+| Field-7   | 0605084325                                                                                                                                                                                                                                                                                                                                             | TRANSMISSION DATE AND TIME         |
+| Field-14  | 2704                                                                                                                                                                                                                                                                                                                                                   | DATE, EXPIRATION                   |
+| Field-18  | 1520                                                                                                                                                                                                                                                                                                                                                   | MERCHANTS TYPE                     |
+| Field-19  | 250                                                                                                                                                                                                                                                                                                                                                    | ACQUIRING INSTITUTION COUNTRY CODE |
+| Field-22  | 000                                                                                                                                                                                                                                                                                                                                                    | POINT OF SERVICE ENTRY MODE        |
+| Field-23  | 001                                                                                                                                                                                                                                                                                                                                                    | CARD SEQUENCE NUMBER               |
+| Field-37  | 608671980642                                                                                                                                                                                                                                                                                                                                           | RETRIEVAL REFERENCE NUMBER         |
+| Field-39  | 000                                                                                                                                                                                                                                                                                                                                                    | ACTION CODE                        |
+| Field-42  | 4992&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                                                                                                                                                                                                                                                                     | CARD ACCEPTOR IDENTIFICATION CODE  |
+| Field-43  | BAX Test&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/Paris&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/FR&nbsp; | CARD ACCEPTOR NAME/LOCATION        |
+| Field-48  | 001002110020328A7F352F86B3F3D2486DB1D7B735080A00501211AA22BB33CC                                                                                                                                                                                                                                                                                       | ADDITIONAL DATA - PRIVATE          |
+| Field-49  | 978                                                                                                                                                                                                                                                                                                                                                    | CURRENCY CODE, TRANSACTION         |
+| Field-64  | 454D14F8695CE5D2                                                                                                                                                                                                                                                                                                                                       | MESSAGE AUTHENTICATION CODE FIELD  |
 
 ### Advice response:
 
@@ -1117,7 +1116,83 @@ Connection: keep-alive
 ERBABAAAAgEBAREFAAUAFWAAAFMnBAAALjAwMTAwMjExMDAyMDMyQTA2QTUwNjFDQkI5RjE1RTE1Nzg4MEM0MDkzQ0YzNzQJBgdTUEFZSENF1kvCKDWu060=
 
 ```
-## 8.4 Field 55 Example
+
+### 8.7.2 Detokenization using AES MAC
+
+### Detokenization Request:
+
+A detokenization request is sent by the remote host to the Cloud TSP to retrieve the PAN from a token. This example calculates the MAC using
+an AES TR-31 key block as a session key and SHA-256 hash for the message transformation. Field-55 is from a PURE wallet.
+
+#### HTTP dump
+
+```
+POST /gtotx/api/iso/stoepay/v10/msg/stoepaycmac HTTP/1.1
+Host: ctsp-proc-pp.baxlab.no:443
+Accept: */*
+TID: efb913de-f7d6-4969-9e00-4ca60b95a5d3
+header: 41000000
+Content-Type: text/plain
+Content-Length: 412
+
+EQByBGYACGGCARMHcREVcFFTQGhJAAAAAAAAACEACBgQBERJAhUgAlAAAAAAOTkwODYxOTc2NjEyNDk5MiAgICAgICAgICAgQkFYIFRlc3QgICAgICAgICAgICAgIC8gICAgIC9QYXJpcyAgICAgICAgICAgICAgICAgLyAgIK8wMDEwMDExMDAyMTQ0RDAxNDRNNkFDMDBFMDAwMDNFNDJFMDBDN0VCOTU2MzM2NEI5MjY1MDU0NEI2MUQ3NkVGMkRBODUzQkI5ODMwNjkwQzE1MjQ4NjlCRkM4MkVEQTE5NzlDRTk0NTk2Q0JFREExQzc2NjVBNTZFRTI2RjhERkZEMTYwREEyOTcwNURDMUQyQzgyNTBDNzc5NjAyMDA1MDEyMTFBQTIyQkIzM0NDCXhpnwIGAAAAACEAnwMGAAAAAAAAnxoCAlCVBQAAAAAAXyoCCXiaAxgBCZwBAJ83BA8BDgOCAhqAnzYCAAGfECAPpQGggQEAALg/fc3fC5zkDwAAAAAAAAAAAAAAAAAAAJ8mCN8LH2kefWIYdfUeZqmVVHKYHw5iVJ3CtA==
+```
+
+#### Fields specification
+
+| Field      | Value                                                                                                                                                                                                                                                                                                                                                            | Description                        |
+|------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------|
+| MTI        | 1100                                                                                                                                                                                                                                                                                                                                                             |                                    |
+| BitMap     | {2, 3, 4, 7, 14, 18, 19, 22, 23, 37, 42, 43, 48, 49, 55, 64}                                                                                                                                                                                                                                                                                                     |                                    |
+| Field-2    | 771111\*\*\*\*\*\*\*\*6849                                                                                                                                                                                                                                                                                                                                       | PAN - PRIMARY ACCOUNT NUMBER       |
+| Field-3    | 000000                                                                                                                                                                                                                                                                                                                                                           | PROCESSING CODE                    |
+| Field-4    | 000000002100                                                                                                                                                                                                                                                                                                                                                     | AMOUNT, TRANSACTION                |
+| Field-7    | 0818100444                                                                                                                                                                                                                                                                                                                                                       | TRANSMISSION DATE AND TIME         |
+| Field-14   | 4902                                                                                                                                                                                                                                                                                                                                                             | DATE, EXPIRATION                   |
+| Field-18   | 1520                                                                                                                                                                                                                                                                                                                                                             | MERCHANTS TYPE                     |
+| Field-19   | 250                                                                                                                                                                                                                                                                                                                                                              | ACQUIRING INSTITUTION COUNTRY CODE |
+| Field-22   | 000                                                                                                                                                                                                                                                                                                                                                              | POINT OF SERVICE ENTRY MODE        |
+| Field-23   | 000                                                                                                                                                                                                                                                                                                                                                              | CARD SEQUENCE NUMBER               |
+| Field-37   | 990861976612                                                                                                                                                                                                                                                                                                                                                     | RETRIEVAL REFERENCE NUMBER         |
+| Field-42   | 4992&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                                                                                                                                                                                                                                                                               | CARD ACCEPTOR IDENTIFICATION CODE  |
+| Field-43   | BAX Test&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/Paris&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp; | CARD ACCEPTOR NAME/LOCATION        |
+| Field-48   | 0010011002144D0144M6AC00E0000......D160DA29705DC1D2C8250C77960200501211AA22BB33CC  (*)                                                                                                                                                                                                                                                                           | ADDITIONAL DATA - PRIVATE          |
+| Field-49   | 978                                                                                                                                                                                                                                                                                                                                                              | CURRENCY CODE, TRANSACTION         |
+| Field-55   | 9F0206000000002100......00000000000000000000009F2608DF0B1F691E7D6218 (**)                                                                                                                                                                                                                                                                                        | IC card system related data        |
+| Field-64   | 75F51E66A9955472981F0E62549DC2B4                                                                                                                                                                                                                                                                                                                                 | MESSAGE AUTHENTICATION CODE FIELD  |
+(*) Full field48: 0010011002144D0144M6AC00E00003E42E00C7EB9563364B92650544B61D76EF2DA853BB9830690C1524869BFC82EDA1979CE94596CBEDA1C7665A56EE26F8DFFD160DA29705DC1D2C8250C77960200501211AA22BB33CC <br>
+(**) Full field55: 9F02060000000021009F03060000000000009F1A020250950500000000005F2A0209789A031801099C01009F37040F010E0382021A809F360200019F10200FA501A081010000B83F7DCDDF0B9CE40F0000000000000000000000000000009F2608DF0B1F691E7D6218
+
+### Detokenization response:
+
+The response is successful and contains the PAN in Field-2. The MAC is computed using
+an AES TR-31 block MAC session key and SHA-256 hash for the message transformation.
+
+#### HTTP dump
+
+```
+HTTP/1.1 200 OK
+TID: efb913de-f7d6-4969-9e00-4ca60b95a5d3
+header: 41000000
+Content-Type: text/plain
+Content-Length: 120
+Date: Thu, 05 Jun 2025 06:01:44 GMT
+Keep-Alive: timeout=20
+Connection: keep-alive
+
+ERBABAAAAgEBAREFAAUAFWAAAFMnBAAALjAwMTAwMjExMDAyMDMyQ0NDQjk2MjE3ODQ4NTU5RkI1RjdFRUZDMjA4NjEzNUEJBgdTUEFZSENFFhQCxLmfVUI=
+```
+| Field      | Value                                                                                                                                                          | Description                        |
+|------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------|
+| MTI        | 1110                                                                                                                                                           |                                    |
+| Field-2    | 957852\*\*\*\*\*\*\*\*8980                                                                                                                                     | PAN - PRIMARY ACCOUNT NUMBER       |
+| Field-14   | 2702                                                                                                                                                           | DATE, EXPIRATION                   |
+| Field-39   | 000                                                                                                                                                            | ACTION CODE                        |
+| Field-48   | 00100201002144D0144M6AC00E00008816EF28E569FBF2658FB3447D7AEFBA9818D1A70775F6DA7BB3C74BE8965231527E9FBDC07AF0E96C9B0293EC12B3FDCB05FB6546554E0CA352830C46B66D8B | ADDITIONAL DATA - PRIVATE          |
+| Field-64   | 010C91754A517D678A6AFDCA9C6707E4                                                                                                                               | MESSAGE AUTHENTICATION CODE FIELD  |
+
+
+## 8.8 Field 55 Example
 
 Field 55 contains the data elements related to the Integrated Circuit Card (ICC). The contents of the fields is a series
 of tags created by the merchant POS typically. It is formatted as a BER-TLV structure, with various tags depending on

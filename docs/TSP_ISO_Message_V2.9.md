@@ -48,7 +48,7 @@ Copyright © 202 1 Thales .
   - [Storage Type](#82-storage-type)
   - [Connectivity Requirements](#83-connectivity-requirements)
     - [TLS Authentication](#831-tls-authentication-https)
-    - [MAC usage](#833-mac-usage)
+    - [MAC usage](#832-mac-usage)
   - [MAC Details](#84-mac-details)
     - [Message transformations](#841-message-transformations)
     - [MAC Algorithm](#842-mac-algorithms)

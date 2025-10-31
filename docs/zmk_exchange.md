@@ -16,22 +16,29 @@ The ZMK will be generated as an AES-256 key, unless customer or business require
 
 For preproduction the ZMK can be delivered via secure email or other secure means agreed upon between the parties.
 
-Below is an example of how the ZMK components can be represented.
-
-```
-Label: EXAMPLE.LABEL.FOR.DOCUMENTATION.PURPOSE.ONLY
-Comp1: 000000001111111122222222333333334444444455555555
-KCV1:  AABBCC
-Comp2: 66666666777777778888888899999999AAAAAAAABBBBBBBB
-KCV2:  FFEEDD
-
-
-KCV for key: AA0099
-```
-
 ## Production procedure
 
-### Parameters
+For production the ZMK will be exchanged via a courier service agreed upon between the parties. If the same courrier
+service is used for all components, the second components will be sent after confirmation of receipt of the first component.
 
-### Delivery
+## Example of digital delivery
 
+Below is an example of how the ZMK components will be delivered.
+
+```
+#############################################
+# STØ Token service - Key Components Form   #
+# Environment: Test / Preprod               #
+# Date       : 2025-10-31                   #
+#############################################
+
+Key Component 1: 0143 2B73 C73E 97D2 09A4 4560 5440 561C 3D81 1563 F540 0A62 9AB3 95F7 27E9 6D8F
+KVC            : D2E93B
+
+Key Component 2: 67D2 2AB3 2ECD 6D3B A4C1 239D 59C6 35EA 5C11 3B7C BBB8 74D6 62A5 1C8F BD0A 7D73
+KVC            : 32F9A0
+
+KVC of KEY     : 094D1D
+```
+
+The KVC algorithm is CMAC for AES keys, and ZL6 (aka encrypt zero) for 3DES (not supported for ZMK in STS).

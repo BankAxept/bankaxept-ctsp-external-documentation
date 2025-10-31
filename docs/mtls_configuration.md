@@ -9,14 +9,13 @@ needs to be followed for both preproduction and production environments.
 The following steps describe the mTLS configuration process;
 
 1. POS aggregator provide a Certificate Signing Request (CSR) to Stø Token Service.
-2. POS aggregator provide source IP address to add to ISO-API allowlist for the required environment.
-3. Stø Token Service signs the CSR and returns a client certificate to the POS aggregator.
-4. Stø Token Service adds the provided source IP address to the ISO-API allowlist.
-5. POS aggregator configures their systems to use the client certificate for mTLS authentication when communicating
-6. A Connectivity test is performed to ensure successful mTLS authentication.
+2. Stø Token Service returns a client certificate to the POS aggregator.
 
-### Certificate signing request (CSR)
+## Certificate signing request (CSR)
 
 The POS aggregator must generate a X509 certificate signing request using their preferred method. The CSR should include
 a common name (CN) that uniquely identifies the POS aggregator and environment, preferably without spaces. The CSR must
 be in PEM format.
+
+The validity of the generated client certificate is typically 2 years and needs to be renewed before expiration.
+

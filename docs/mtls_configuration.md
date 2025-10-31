@@ -13,9 +13,9 @@ The following steps describe the mTLS configuration process;
 
 ## Certificate signing request (CSR)
 
-The POS aggregator must generate a X509 certificate signing request using their preferred method. The CSR should include
-a common name (CN) that uniquely identifies the POS aggregator and environment, preferably without spaces. The CSR must
-be in PEM format.
+The POS aggregator must generate a X509 certificate signing request using their preferred method. The CSR must include
+C (Country), O (OrganizationName) and CN (CommonName). The common name (CN) should uniquely identify the POS aggregator
+and environment, preferably without spaces. The CSR must be in PEM format.
 
-The validity of the generated client certificate is typically 2 years and needs to be renewed before expiration.
+The validity of the generated client certificate is typically 3 years and needs to be renewed before expiration.
 

@@ -20,10 +20,12 @@ The components are joined with XOR.
 
 ## Production procedure
 
-For production the ZMK will be exchanged via a courier service agreed upon between the parties. If the same courrier
+For production the ZMK will be exchanged via a courier service agreed upon between the parties. If the same courier
 service is used for all components, the second components will be sent after confirmation of receipt of the first component.
 
-The components are joined with XOR.
+The component will be delivered in tamperproof envelopes to named key custodians, that sign off the receipt of the components.
+
+Key components are joined with XOR.
 
 ## Example of digital delivery for test / preproduction
 

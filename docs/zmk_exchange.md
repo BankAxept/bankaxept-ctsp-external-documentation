@@ -1,31 +1,38 @@
 # Zone Master Key (ZMK) Exchange
 
-## Introduction
+A Zone Master Key (ZMK) exchange is required to establish trust between the POS aggregator and the Stoe Token Service Provider (STS).
+After both parties have loaded the ZMK in to their respective hardware security modules (HSM).
 
-A Zone Master Key (ZMK) exchange is required to establish trust between the POS aggregator and the Stoe Token Service Provider (STS). After both parties have loaded the ZMK in to their respective hardware security modules (HSM).
+The ZMK will be delivered as key components, where each component is delivered separately to different key custodians.
+Each component is provided with a KVC and the KVC to the final key. The KVC algorithm is CMAC for AES keys, and ZL6
+(aka encrypt zero) for 3DES (not supported for ZMK in STS).
+
+## Key Exchange and Delivery Procedure
+
+### ZMK Exchange Method
+For production environments, the Zone Master Key (ZMK) shall be exchanged via a courier service mutually agreed upon by the involved parties. If a single courier service is employed for the delivery of all key components, the second component shall be dispatched only upon confirmed receipt of the first component.
+
+### ZMK Generation and Format
+The ZMK shall be generated using the AES-256 encryption standard, unless alternative specifications are required due to customer or business constraints. The key will be delivered digitally in two separate components.
+
+### Key Length Limitation
+It is important to note that the ZMK can only be used to protect cryptographic keys that are of equal or shorter length than the ZMK itself.
+
+### Component Delivery Protocol
+Each key component shall be enclosed in tamper-evident envelopes and delivered to designated key custodians. Custodians are required to formally acknowledge receipt by signing the delivery documentation.
+
+### Key Component Combination Method
+The two key components shall be combined using the bitwise XOR operation to reconstruct the complete ZMK.
 
 ## Preproduction procedure
 
 For preproduction the exchange of ZMK can be done via secure email or other secure means agreed upon between the parties. The key ceremony can be done by either parties. Details about Stø procedure can be provided on request.
-
-### Parameters
-
-The ZMK will be generated as an AES-256 key, unless customer or business requirements demand anything else, and be delivered as two components digitally. Please note that the ZMK can only protect keys that are of the same length or shorter than the ZMK itself.
 
 ### Delivery
 
 For preproduction the ZMK can be delivered via secure email or other secure means agreed upon between the parties.
 
 The components are joined with XOR.
-
-## Production procedure
-
-For production the ZMK will be exchanged via a courier service agreed upon between the parties. If the same courier
-service is used for all components, the second components will be sent after confirmation of receipt of the first component.
-
-The component will be delivered in tamperproof envelopes to named key custodians, that sign off the receipt of the components.
-
-Key components are joined with XOR.
 
 ## Example of digital delivery for test / preproduction
 
@@ -80,5 +87,3 @@ KVC of KEY     : 094D1D
 ```
 
 Note that the KVC of key refers to the complete ZMK.
-
-The KVC algorithm is CMAC for AES keys, and ZL6 (aka encrypt zero) for 3DES (not supported for ZMK in STS).

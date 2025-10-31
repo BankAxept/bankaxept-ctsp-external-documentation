@@ -24,7 +24,7 @@ Each key component shall be enclosed in tamper-evident envelopes and delivered t
 ### Key Component Combination Method
 The two key components shall be combined using the bitwise XOR operation to reconstruct the complete ZMK.
 
-## Preproduction procedure
+## Key Exchange and Delivery Procedure Preproduction
 
 For preproduction the exchange of ZMK can be done via secure email or other secure means agreed upon between the parties. The key ceremony can be done by either parties. Details about Stø procedure can be provided on request.
 
@@ -34,7 +34,7 @@ For preproduction the ZMK can be delivered via secure email or other secure mean
 
 The components are joined with XOR.
 
-## Example of digital delivery for test / preproduction
+### Example of digital delivery for test / preproduction
 
 For preproduction both components can be delivered digitally. Below is an example of how the ZMK components will be delivered.
 

@@ -33,7 +33,7 @@ All messages exchanged with the ISO-API are protected using a Message Authentica
 
 ### Deprecated MAC Algorithm
 
-- ISO 9797-1 Algorithm 3 (3DES, with padding method 1; output is the leftmost 8 bytes)
+- ISO 9797-1 Algorithm 3 (3DES, with padding method 1 or method 3; output is the leftmost 8 bytes)
 
 ## Key Interchange (KI)
 

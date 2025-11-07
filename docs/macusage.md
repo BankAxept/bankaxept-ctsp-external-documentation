@@ -5,7 +5,7 @@ All messages exchanged with the ISO-API are protected using a Message Authentica
 ## Principles
 
 - Every ISO message is protected with a MAC.
-- An ephemeral MAC key is generated for each message (recommended maximum lifetime: 1 hour). The key may be reused within this period.
+- An ephemeral MAC key can be generated for each message, but the same key may be reused for multiple messages within a recommended maximum lifetime of 1 hour.
 - The MAC key is encrypted using a Key Interchange (KI) key, which is protected by an agreed key protection method.
 - KI keys are exchanged between parties, encrypted under a Zone Master Key (ZMK), and imported into a Hardware Security Module (HSM).
 - The ZMK is exchanged during a key ceremony.

@@ -14,7 +14,7 @@ All messages exchanged with the ISO-API are protected using a Message Authentica
 
 1. **Generate Ephemeral MAC Key:** Create a new MAC key for the message.
 2. **Encrypt MAC Key:** Encrypt the MAC key under the KI key and include it in Field 48, subfield 002.
-3. **Prepare ISO Message:** Construct the message, ensuring the ISO bitmap, which contains a list of fields present in the message, include Field 64 (MAC)..
+3. **Prepare ISO Message:** Construct the message, ensuring the ISO bitmap, which contains a list of fields present in the message, include Field 64 (MAC).
 4. **Message Transformation:** Apply the agreed transformation (e.g., SHA-256) to the message, excluding Field 64.
 5. **Compute MAC:** Calculate the MAC over the transformed message using the ephemeral MAC key.
 6. **Insert MAC:** Place the MAC in Field 64 of the ISO message.

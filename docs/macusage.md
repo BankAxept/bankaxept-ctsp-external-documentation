@@ -40,7 +40,7 @@ All messages exchanged with the ISO-API are protected using a Message Authentica
 - KI is the encrypted key used to protect the ephemeral MAC key.
 - KI keys are exchanged during setup, encrypted under the ZMK, and protected by HSM.
 - KI is identified by a key index (1–255), present in Field 48, subfield 001, allowing for key renewal.
-- KI and ZMK must be of equal or greater strength (AES or 3DES, as appropriate).
+- ZMK must have higher strength than KI.
 
 ## MAC Key
 

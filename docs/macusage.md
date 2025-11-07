@@ -1,16 +1,40 @@
-# MAC usage
+# MAC in ISO-API
 
-Usage of MAC is required in all ISO Message (Request and Response). See MAC details
+All messages to and from the ISO-API are protected using a Message Authentication Code (MAC). The initiator of the message
+create a MAC according to the agreed parameters and the receiver of the message verifies the MAC. If the MAC verification
+fail, the message is rejected. Likewise, the MAC in the response needs to be verified by the initiator of the message.
 
 ## MAC details
 
 The following principles shall be applied:
 
-* All ISO messages are protected using a MAC.
-* A new MAC key is generated for each ISO Message.
-* The MAC key is protected using an Encryption key (Key Interchange)
+* All ISO messages are protected using a message authentication code (MAC).
+* A new MAC key is generated for each ISO Message, this key is called ephemeral MAC key. The key can be reused for
+  several messages within a limited time frame (recommendation: maximum 1 hour).
+* The MAC key is secured using an encryption key, referred to as the Key Interchange (KI) key, with an agreed key protection method.
 * Key Interchange Keys will be exchanged between each party encrypted under a ZMK
 * The ZMK (Zone Master Key) are exchanged during a key ceremony and imported into HSM.
+
+## Message preparation
+
+The MAC is computed over the full ISO message excluding the MAC field (Field 64). The message is transformed using a
+defined message transformation before the MAC is computed. The resulting MAC is put in Field 64 of the ISO message.
+
+Note that the key used to compute the MAC needs to be present in the ISO message, encrypted under the Key Interchange key.
+
+So, the whole message needs to be completed before the MAC is computed, except for the MAC field itself.
+
+Please note that the ISO bitmap needs to be updated to reflect the presence of Field 64 before the MAC is computed, as
+the field will be present when the MAC is verified.
+
+This can be summarised in the following steps:
+
+1. Generate a new ephemeral MAC key
+2. Encrypt the MAC key under the Key Interchange key and put it in Field 48, subfield 002
+3. Prepare the ISO message, including updating the bitmap to reflect the presence of Field 64
+4. Transform the message using the agreed message transformation
+5. Compute the MAC over the transformed message using the ephemeral MAC key
+6. Put the MAC in Field 64 of the ISO message
 
 ### Message transformations
 
@@ -25,19 +49,27 @@ following transformations are supported:
 
 The following algorithms are supported:
 
-* ISO 9797 algorithm 3 (3DES)
-* CMAC (AES)
+CMAC (AES)
+
+### Deprecated MAC algorithms
+
+For legacy projects, the ISO-API still support the following deprecated MAC algorithms, but this will not be supported
+for new projects.
+
+ISO 9797 algorithm 3 (3DES)
 
 ### MAC key protection alternatives
 
 Currently there is support for 5 key interchange alternatives
 
-* 2KeyTDES ECB no-padding
-* 3KeyTDES ECB no-padding
-
 * AES-128 (TR-31)
 * AES-192 (TR-31)
 * AES-256 (TR-31)
+
+#### Deprecated key interchange alternatives
+
+* 2KeyTDES ECB no-padding
+* 3KeyTDES ECB no-padding
 
 ## Key Interchange
 
@@ -63,7 +95,17 @@ MAC is present in Field n° 64 – Message Authentication Code
 Input data of the MAC is SHA-256 hash of the full ISO payload encoded to bytes excluding the mac value field (Field 64).
 Note: SHA-256 hash is used by default. SHA-1 hash can be used under request.
 
-## Keys type and algorithms – 3DES
+## Keys type and algorithms – AES
+
+|                  |                                                                                                                                     |
+|------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| KI Key Type      | AES (128, 192 or 256 bits)                                                                                                          |
+| MAC Key Type     | AES 128, 192 or 256 bits                                                                                                            |
+| MAC Key wrapping | AES TR-31                                                                                                                           |
+| MAC	             | AES-CMAC Algorithm (RFC 4493), with padding as defined in the AES-CMAC specification The MAC is the 8 leftmost bytes of the output. |
+
+
+## Keys type and algorithms – 3DES - deprecated
 
 |                  |                                                                                                                                                                                                                                                 |
 |------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -73,13 +115,4 @@ Note: SHA-256 hash is used by default. SHA-1 hash can be used under request.
 | MAC              | MAC Algorithm 3 (ISO 9797-1 Algorithm 3). Padding method 1 is used: input data is completed with `0`s until the data reaches a multiple of 8-byte blocks. No `0` is added if already a multiple. The MAC is the 8 leftmost bytes of the output. |
 
 (*) KI Key length depends to remote Host capability
-
-## Keys type and algorithms – AES
-
-|                  |                                                                                                                                     |
-|------------------|-------------------------------------------------------------------------------------------------------------------------------------|
-| KI Key Type      | AES (128, 192 or 256 bits)                                                                                                          |
-| MAC Key Type     | 	AES 128, 192 or 256 bits                                                                                                           |
-| MAC Key wrapping | 	AES TR-31                                                                                                                          |
-| MAC	             | AES-CMAC Algorithm (RFC 4493), with padding as defined in the AES-CMAC specification The MAC is the 8 leftmost bytes of the output. |
 

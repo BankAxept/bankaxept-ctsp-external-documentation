@@ -60,12 +60,12 @@ All messages exchanged with the ISO-API are protected using a Message Authentica
 
 ### 3DES (Deprecated)
 
-| Component         | Specification                                                                                      |
-|-------------------|---------------------------------------------------------------------------------------------------|
-| KI Key Type       | 2-key (16 bytes) or 3-key (24 bytes) 3DES                                                         |
-| MAC Key Type      | 2-key 3DES (16 bytes)                                                                             |
-| MAC Key Wrapping  | 3DES using CBC or ECB                                                                             |
-| MAC Algorithm     | ISO 9797-1 Algorithm 3, padding method 1; MAC is the leftmost 8 bytes of the output               |
+| Component         | Specification                                                                                   |
+|-------------------|-------------------------------------------------------------------------------------------------|
+| KI Key Type       | 2-key (16 bytes) or 3-key (24 bytes) 3DES                                                       |
+| MAC Key Type      | 2-key 3DES (16 bytes)                                                                           |
+| MAC Key Wrapping  | 3DES using CBC or ECB                                                                           |
+| MAC Algorithm     | ISO 9797-1 Algorithm 3, padding method 1 or method 3; MAC is the leftmost 8 bytes of the output |
 
 ## Key Interchange Alternatives
 

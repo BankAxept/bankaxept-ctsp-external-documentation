@@ -1,118 +1,83 @@
-# MAC in ISO-API
+# Message Authentication Code (MAC) Usage in ISO-API
 
-All messages to and from the ISO-API are protected using a Message Authentication Code (MAC). The initiator of the message
-create a MAC according to the agreed parameters and the receiver of the message verifies the MAC. If the MAC verification
-fail, the message is rejected. Likewise, the MAC in the response needs to be verified by the initiator of the message.
+All messages exchanged with the ISO-API are protected using a Message Authentication Code (MAC) to ensure integrity and authenticity. The sender generates a MAC based on agreed parameters, and the receiver verifies it. If verification fails, the message is rejected. The response message is also protected and verified in the same manner.
 
-## MAC details
+## Principles
 
-The following principles shall be applied:
+- Every ISO message is protected with a MAC.
+- An ephemeral MAC key is generated for each message (recommended maximum lifetime: 1 hour). The key may be reused within this period.
+- The MAC key is encrypted using a Key Interchange (KI) key, which is protected by an agreed key protection method.
+- KI keys are exchanged between parties, encrypted under a Zone Master Key (ZMK), and imported into a Hardware Security Module (HSM).
+- The ZMK is exchanged during a key ceremony.
 
-* All ISO messages are protected using a message authentication code (MAC).
-* A new MAC key is generated for each ISO Message, this key is called ephemeral MAC key. The key can be reused for
-  several messages within a limited time frame (recommendation: maximum 1 hour).
-* The MAC key is secured using an encryption key, referred to as the Key Interchange (KI) key, with an agreed key protection method.
-* Key Interchange Keys will be exchanged between each party encrypted under a ZMK
-* The ZMK (Zone Master Key) are exchanged during a key ceremony and imported into HSM.
+## Message Preparation
 
-## Message preparation
+1. **Generate Ephemeral MAC Key:** Create a new MAC key for the message.
+2. **Encrypt MAC Key:** Encrypt the MAC key under the KI key and include it in Field 48, subfield 002.
+3. **Prepare ISO Message:** Construct the message, ensuring the bitmap reflects the presence of Field 64 (MAC).
+4. **Message Transformation:** Apply the agreed transformation (e.g., SHA-256) to the message, excluding Field 64.
+5. **Compute MAC:** Calculate the MAC over the transformed message using the ephemeral MAC key.
+6. **Insert MAC:** Place the MAC in Field 64 of the ISO message.
 
-The MAC is computed over the full ISO message excluding the MAC field (Field 64). The message is transformed using a
-defined message transformation before the MAC is computed. The resulting MAC is put in Field 64 of the ISO message.
+**Note:** The encrypted MAC key must be present in the message (Field 48, subfield 002). The bitmap must indicate Field 64 before MAC computation, as it will be present during verification.
 
-Note that the key used to compute the MAC needs to be present in the ISO message, encrypted under the Key Interchange key.
+## Message Transformation Options
 
-So, the whole message needs to be completed before the MAC is computed, except for the MAC field itself.
+- SHA-1
+- SHA-256 (default)
+- None
 
-Please note that the ISO bitmap needs to be updated to reflect the presence of Field 64 before the MAC is computed, as
-the field will be present when the MAC is verified.
+## Supported MAC Algorithms
 
-This can be summarised in the following steps:
+- AES-CMAC (RFC 4493, with padding as specified; output is the leftmost 8 bytes)
 
-1. Generate a new ephemeral MAC key
-2. Encrypt the MAC key under the Key Interchange key and put it in Field 48, subfield 002
-3. Prepare the ISO message, including updating the bitmap to reflect the presence of Field 64
-4. Transform the message using the agreed message transformation
-5. Compute the MAC over the transformed message using the ephemeral MAC key
-6. Put the MAC in Field 64 of the ISO message
+### Deprecated MAC Algorithm
 
-### Message transformations
+- ISO 9797-1 Algorithm 3 (3DES, with padding method 1; output is the leftmost 8 bytes)
 
-The transformation is applied to the message and the output from the transformation is input to the MAC algorithm. The
-following transformations are supported:
+## Key Interchange (KI)
 
-* SHA1
-* SHA-256
-* None
+- KI is the encrypted key used to protect the ephemeral MAC key.
+- KI keys are exchanged during setup, encrypted under the ZMK, and protected by HSM.
+- KI is identified by a key index (1–255), present in Field 48, subfield 001, allowing for key renewal.
+- KI and ZMK must be of equal or greater strength (AES or 3DES, as appropriate).
 
-### MAC algorithms
+## MAC Key
 
-The following algorithms are supported:
+- Each ISO message contains a MAC key, encrypted under KI (Field 48, subfield 002).
+- The MAC key is ephemeral and should be regenerated at least every hour.
 
-CMAC (AES)
+## Key Types and Algorithms
 
-### Deprecated MAC algorithms
+### AES (Recommended)
 
-For legacy projects, the ISO-API still support the following deprecated MAC algorithms, but this will not be supported
-for new projects.
+| Component         | Specification                                                                                      |
+|-------------------|---------------------------------------------------------------------------------------------------|
+| KI Key Type       | AES (128, 192, or 256 bits)                                                                       |
+| MAC Key Type      | AES (128, 192, or 256 bits)                                                                       |
+| MAC Key Wrapping  | AES TR-31                                                                                         |
+| MAC Algorithm     | AES-CMAC (RFC 4493), with padding; MAC is the leftmost 8 bytes of the output                      |
 
-ISO 9797 algorithm 3 (3DES)
+### 3DES (Deprecated)
 
-### MAC key protection alternatives
+| Component         | Specification                                                                                      |
+|-------------------|---------------------------------------------------------------------------------------------------|
+| KI Key Type       | 2-key (16 bytes) or 3-key (24 bytes) 3DES                                                         |
+| MAC Key Type      | 2-key 3DES (16 bytes)                                                                             |
+| MAC Key Wrapping  | 3DES using CBC or ECB                                                                             |
+| MAC Algorithm     | ISO 9797-1 Algorithm 3, padding method 1; MAC is the leftmost 8 bytes of the output               |
 
-Currently there is support for 5 key interchange alternatives
+## Key Interchange Alternatives
 
-* AES-128 (TR-31)
-* AES-192 (TR-31)
-* AES-256 (TR-31)
+- AES-128 (TR-31)
+- AES-192 (TR-31)
+- AES-256 (TR-31)
 
-#### Deprecated key interchange alternatives
+### Deprecated Alternatives
 
-* 2KeyTDES ECB no-padding
-* 3KeyTDES ECB no-padding
+- 2KeyTDES ECB (no padding)
+- 3KeyTDES ECB (no padding)
 
-## Key Interchange
+---
 
-KI (Key Interchange) is the encrypted key used to encrypt the ephemeral MAC Key
-KI shall be exchanged between the parties during the setup phase.
-KI are exchanged encrypted under ZMK and shall be protected by HSM.
-KI is identified by a key index (1 to 255) and allow Key Interchange switchover (key renewal)
-Key index is present in ISO Message in field 48, subfield 001.
-
-When using 3DES keys, the KI and ZMK must be 3DES keys of equal or better strength
-When using AES keys, the KI and ZMK must be AES keys of equal or better strength
-
-## MAC key
-
-A MAC key shall be present in each ISO message, encrypted under KI in (Identifier "002", the MAC key)
-The MAC key is an ephemeral key to be generated by each party and could be reused in several ISO Messages.
-The maximum lifetime recommendation for an ephemeral MAC key is 1 hour.
-
-## MAC
-
-MAC shall be computed for each ISO Message.
-MAC is present in Field n° 64 – Message Authentication Code
-Input data of the MAC is SHA-256 hash of the full ISO payload encoded to bytes excluding the mac value field (Field 64).
-Note: SHA-256 hash is used by default. SHA-1 hash can be used under request.
-
-## Keys type and algorithms – AES
-
-|                  |                                                                                                                                     |
-|------------------|-------------------------------------------------------------------------------------------------------------------------------------|
-| KI Key Type      | AES (128, 192 or 256 bits)                                                                                                          |
-| MAC Key Type     | AES 128, 192 or 256 bits                                                                                                            |
-| MAC Key wrapping | AES TR-31                                                                                                                           |
-| MAC	             | AES-CMAC Algorithm (RFC 4493), with padding as defined in the AES-CMAC specification The MAC is the 8 leftmost bytes of the output. |
-
-
-## Keys type and algorithms – 3DES - deprecated
-
-|                  |                                                                                                                                                                                                                                                 |
-|------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| KI Key Type      | "3 key" 3DES (size 24 bytes) or "2 key" 3DES (size 16 bytes) (*)                                                                                                                                                                                |
-| MAC Key Type     | "2 key" 3DES (size 16 bytes)                                                                                                                                                                                                                    |
-| MAC Key wrapping | 3DES using CBC or ECB                                                                                                                                                                                                                           |
-| MAC              | MAC Algorithm 3 (ISO 9797-1 Algorithm 3). Padding method 1 is used: input data is completed with `0`s until the data reaches a multiple of 8-byte blocks. No `0` is added if already a multiple. The MAC is the 8 leftmost bytes of the output. |
-
-(*) KI Key length depends to remote Host capability
-
+**Note:** For legacy projects, deprecated algorithms and key types are supported but not recommended for new implementations.

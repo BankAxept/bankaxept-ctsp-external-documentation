@@ -51,12 +51,12 @@ All messages exchanged with the ISO-API are protected using a Message Authentica
 
 ### AES (Recommended)
 
-| Component         | Specification                                                                                      |
-|-------------------|---------------------------------------------------------------------------------------------------|
-| KI Key Type       | AES (128, 192, or 256 bits)                                                                       |
-| MAC Key Type      | AES (128, 192, or 256 bits)                                                                       |
-| MAC Key Wrapping  | AES TR-31                                                                                         |
-| MAC Algorithm     | AES-CMAC (RFC 4493), with padding; MAC is the leftmost 8 bytes of the output                      |
+| Component         | Specification                                                             |
+|-------------------|---------------------------------------------------------------------------|
+| KI Key Type       | AES (128, 192, or 256 bits)                                               |
+| MAC Key Type      | AES (128, 192, or 256 bits)                                               |
+| MAC Key Wrapping  | AES TR-31                                                                 |
+| MAC Algorithm     | AES-CMAC (RFC 4493), with padding; MAC is the full 16 bytes of the output |
 
 ### 3DES (Deprecated)
 

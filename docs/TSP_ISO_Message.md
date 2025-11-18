@@ -48,7 +48,7 @@ Copyright © 202 1 Thales .
   - [Storage Type](#82-storage-type)
   - [Connectivity Requirements](#83-connectivity-requirements)
     - [TLS Authentication](#831-tls-authentication-https)
-    - [MAC usage](#832-mac-usage)
+    - [MAC usage](#833-mac-usage)
   - [MAC Details](#84-mac-details)
     - [Message transformations](#841-message-transformations)
     - [MAC Algorithm](#842-mac-algorithms)
@@ -776,10 +776,10 @@ Interface messages.
 
 ## 7.20 Field n° 64 – Message Authentication Code
 
-|                 |                                                                                                                                                                             |
-|-----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Attribute**   | b-8 OR b-16                                                                                                                                                                 |
-| **Description** | Message Authentication Code [MAC]) validates the source and the text of the message between the sender and the receiver. Note that when using CMAC, the field is binary 16. |
+|                 |                                                                                                                                                                                                                          |
+|-----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Attribute**   | b-8                                                                                                                                                                                                                      |
+| **Description** | Message Authentication Code [MAC]) validates the source and the text of the message between the sender and the receiver. <br/> It is generated using the MAC key provided in field 48 (Identifier “001”) See MAC details |
 
 # 8 Appendix
 

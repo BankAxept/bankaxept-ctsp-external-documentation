@@ -104,15 +104,6 @@ paths:
         204:
           description: Successful operation. The request was processed successfully.
       x-codegen-request-body-name: body
-  /healthcheck:
-    get:
-      description: This endpoint is used to check the readiness of the API.
-      tags:
-        - healthcheck
-      operationId: healthcheck
-      responses:
-        204:
-          description: Health check completed sucessfully.
 components:
   schemas:
     DetokenizationRequest:

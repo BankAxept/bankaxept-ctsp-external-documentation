@@ -57,7 +57,6 @@ Copyright © 202 1 Thales .
     - [MAC algorithms](#845-mac-algorithms)
     - [Key types and algorithms - 3DES](#846-key-types-and-algorithms---3des-note-3des-not-supported-for-new-projects)
     - [Keys type and algorithms – AES](#847-key-types-and-algorithms---aes)
-  - [Healthcheck Interface](#85-healthcheck-interface)
   - [ISO interface](#86-iso-interface)
   - [ISO8583 request/response examples](#87-iso8583-requestresponse-examples)
 
@@ -91,7 +90,7 @@ Table 4 - FIELDS PRESENCE IN ISO MESSAGES
 | 2.6     | 06/02/2023 | Section 7.2 – Add transaction type code 36 <br/> Section 7.5 – Added new field 12 Date and time local transaction <br/> Section 7.19 – Added tags, 10, 11 and 12 <br/> Section 8.4 – Clearifications on MAC details <br/> Section 8.4 – Include new option for AES in MAC                                                                                                                                                                                                                                                                                                                     |                                                                                                                                                                                                                                                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | 2.7     | 07/08/2023 | Section 7.6 – Add support for unknown token expiry from processor <br/> Section 8.3 removed VPN section as it is not supported. <br/> Section 7.5 Clarification on field 12 <br/> Section 8.5 Details about health check <br/> Section 8.6 Corrected URL scheme <br/> unified dateformat in revision                                                                                                                                                                                                                                                                                          |                                                                                                                                                                                                                                                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | 2.8     | 07/08/2023 | Section 8.7 – Update examples with currently supported message format. <br/> Section 7.18 Move details about tags to appendix.                                                                                                                                                                                                                                                                                                                                                                                                                                                                |                                                                                                                                                                                                                                                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| 2.9     | 13/08/2025 | Section 8.4 - Improved MAC documentation. <br/> Section 8.7 Include examples of AES CMAC. <br/> Section 3.6 Data Elements Coding - Alphanumeric field - Improved explanation of the example of field 43 <br/> Section 7.15 Field n° 43 – Card Acceptor Name and Address - Improved description of the field. <br/> Section 7.20 Field n° 64 - clarification regarding field length when using CMAC.                                                                                                                                                                                           |
+| 2.9     | 13/08/2025 | Section 8.4 - Improved MAC documentation. <br/> Section 8.7 Include examples of AES CMAC. <br/> Section 3.6 Data Elements Coding - Alphanumeric field - Improved explanation of the example of field 43 <br/> Section 7.15 Field n° 43 – Card Acceptor Name and Address - Improved description of the field. <br/> Section 7.20 Field n° 64 - clarification regarding field length when using CMAC. <br/> Remove section 8.5 Healthcheck interface                                                                                                                                            |
 
 # 1 Introduction
 
@@ -930,53 +929,7 @@ The following algorithms are supported:
 | MAC                      | AES-CMAC Algorithm (RFC 4493), with padding as defined in the AES-CMAC specification The MAC is the 8 leftmost bytes of the output. |
 
 
-
-
-## 8.5 Healthcheck interface
-
-A healthcheck mechanism allow testing on a regular basis the peer to peer connectivity. On HTTP request to dedicated
-URL, a successful response is returned by TSP while the status is up and running. This healthcheck should not be called
-more often than once per minute.
-
-### 8.5.1 Pre-Production
-
-#### Option 1:
-> GET /gtotx/api/healthcheck HTTP/1.1
-> Host: ctsp-proc-pp.baxlab.no
-> User-Agent: curl/8.6.0
-> Accept: */*
->
-< HTTP/1.1 204
-
-#### Option 2 (Deprecated):
-> GET /gtotx/api/iso/healthcheck HTTP/1.1
-> Host: ctsp-proc-pp.baxlab.no
-> User-Agent: curl/8.6.0
-> Accept: */*
->
-< HTTP/1.1 200
-< Content-Type: text/html; charset=utf-8
-
-### 8.5.2 Production
-
-#### Option 1:
-> GET /gtotx/api/healthcheck HTTP/1.1
-> Host: tx.ctsp.stoe.no
-> User-Agent: curl/8.6.0
-> Accept: */*
->
-< HTTP/1.1 204
-
-### Option 2 (Deprecated):
-> GET /gtotx/api/iso/healthcheck HTTP/1.1
-> Host: tx.ctsp.stoe.no
-> User-Agent: curl/8.6.0
-> Accept: */*
->
-< HTTP/1.1 200
-< Content-Type: text/html; charset=utf-8
-
-## 8.6 ISO interface
+## 8.5 ISO interface
 
 ISO message are carried over HTTP.
 
@@ -986,11 +939,11 @@ URL is formatted as below, the actual URL will be provided:
 
   https://<domain name>/gtotx/api/iso/<scheme>/v10/msg/<processor>
 
-## 8.7 ISO8583 request/response examples
+## 8.6 ISO8583 request/response examples
 
 The following examples illustrate the ISO8583 request/response messages that are exchanged between the remote host and the Cloud TSP.
 
-### 8.7.1 Detokenization using 3DES MAC
+### 8.6.1 Detokenization using 3DES MAC
 
 ### Detokenization Request:
 
@@ -1129,7 +1082,7 @@ ERBABAAAAgEBAREFAAUAFWAAAFMnBAAALjAwMTAwMjExMDAyMDMyQTA2QTUwNjFDQkI5RjE1RTE1Nzg4
 
 ```
 
-### 8.7.2 Detokenization using AES MAC
+### 8.6.2 Detokenization using AES MAC
 
 ### Detokenization Request:
 
@@ -1204,7 +1157,7 @@ ERBABAAAAgEBAREFAAUAFWAAAFMnBAAALjAwMTAwMjExMDAyMDMyQ0NDQjk2MjE3ODQ4NTU5RkI1RjdF
 | Field-64   | 010C91754A517D678A6AFDCA9C6707E4                                                                                                                               | MESSAGE AUTHENTICATION CODE FIELD  |
 
 
-## 8.8 Field 55 Example
+## 8.7 Field 55 Example
 
 Field 55 contains the data elements related to the Integrated Circuit Card (ICC). The contents of the fields is a series
 of tags created by the merchant POS typically. It is formatted as a BER-TLV structure, with various tags depending on

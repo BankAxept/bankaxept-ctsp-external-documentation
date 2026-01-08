@@ -57,8 +57,8 @@ Copyright © 202 1 Thales .
     - [MAC algorithms](#845-mac-algorithms)
     - [Key types and algorithms - 3DES](#846-key-types-and-algorithms---3des-note-3des-not-supported-for-new-projects)
     - [Keys type and algorithms – AES](#847-key-types-and-algorithms---aes)
-  - [ISO interface](#86-iso-interface)
-  - [ISO8583 request/response examples](#87-iso8583-requestresponse-examples)
+  - [ISO interface](#85-iso-interface)
+  - [ISO8583 request/response examples](#86-iso8583-requestresponse-examples)
 
 # Table List
 

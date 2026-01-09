@@ -29,7 +29,7 @@ All messages exchanged with the ISO-API are protected using a Message Authentica
 
 ## Supported MAC Algorithms
 
-- AES-CMAC (RFC 4493, with padding as specified; output is the leftmost 8 bytes)
+- AES-CMAC (RFC 4493, with padding as specified
 
 ### Deprecated MAC Algorithm
 

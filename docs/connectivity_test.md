@@ -1,5 +1,13 @@
 # Connectivity test procedure
 
+Communication between the POS aggregator and the ISO-API of Stø Token Service is secured using mutual TLS (mTLS). After
+the POS aggregator has completed the mTLS configuration steps, it is essential to perform a connectivity test to ensure
+that the setup is functioning correctly.
+
+Note that the POS aggregator should not pin the server certificate, as the ISO-API server certificate may be renewed or
+updated by Stø Token Service. Instead, the POS aggregator should trust the certificate authority (CA) that issued the
+server certificate.
+
 ## Preproduction environment
 
 After source IP is added to allow list and client certificate is installed, the POS aggregator should perform a connectivity

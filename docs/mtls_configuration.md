@@ -1,21 +1,44 @@
-# Mutual TLS configuration
+# Mutual TLS
 
-The ISO-API of Stø Token Service requires mutual TLS (mTLS) authentication for enhanced security. This document outlines
-the steps necessary to configure mTLS for secure communication between POS aggregators and the ISO-API. The procedure 
-needs to be followed for both preproduction and production environments.
+STS requires mutual TLS (mTLS) authentication. You authenticate to STS with a client certificate
+issued by Stø; STS authenticates to you with a server certificate.
+
+Perform this procedure for both preproduction and production. Certificates are environment-specific
+and are not interchangeable.
 
 ## Procedure
 
-The following steps describe the mTLS configuration process;
+1. Generate a certificate signing request (CSR) and send it to the Stø Token Service support team.
+2. Stø issues a client certificate and returns it to you.
+3. Install the certificate and verify the connection with the
+   [connectivity test](connectivity_test.md).
 
-1. POS aggregator provide a Certificate Signing Request (CSR) to Stø Token Service.
-2. Stø Token Service returns a client certificate to the POS aggregator.
+## Certificate signing request
 
-## Certificate signing request (CSR)
+Generate an X.509 CSR using your preferred method. It must:
 
-The POS aggregator must generate a X509 certificate signing request using their preferred method. The CSR must include
-C (Country), O (OrganizationName) and CN (CommonName). The common name (CN) should uniquely identify the POS aggregator
-and environment, preferably without spaces. The CSR must be in PEM format.
+* be in **PEM** format;
+* include the **C** (Country), **O** (Organization Name) and **CN** (Common Name) attributes;
+* use a Common Name that uniquely identifies both your organization and the environment, preferably
+  without spaces.
 
-The validity of the generated client certificate is typically 3 years and needs to be renewed before expiration.
+Because the Common Name identifies the environment as well as the organization, generate a separate
+CSR for preproduction and for production.
 
+If you are also integrating against the [JSON detokenization API](choosing_an_interface.md), you need
+a second, separate CSR for the data encryption certificate, generated with a 2048-bit or 4096-bit
+key.
+
+## Validity and renewal
+
+Client certificates are typically valid for **three years**.
+
+!!! warning "Renew before expiry"
+
+    An expired client certificate will fail mTLS authentication and stop all traffic. Track the
+    expiry date and begin renewal — a new CSR — well before it is reached.
+
+## Server certificates
+
+To validate the STS server certificate, your client needs the relevant certificate chain in its trust
+store. The chains for both environments are in [Connectivity test](connectivity_test.md).

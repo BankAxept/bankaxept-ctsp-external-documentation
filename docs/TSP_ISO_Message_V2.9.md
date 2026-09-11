@@ -1,4 +1,4 @@
-# Thales - ISO 8583 Interface with Cloud TSP
+# Thales - ISO 8583 Interface with Stø Token Service
 
 Confidential information of Thales
 NO WARRANTIES OF ANY NATURE ARE EXTENDED BY THIS DOCUMENT. Any product and related material
@@ -12,14 +12,10 @@ You should be careful to ensure that the use of this information and/or software
 laws, rules, and regulations of the jurisdictions with respect to which it is used. All rights reserved.
 Copyright © 202 1 Thales .
 
-# Table of Contents
+## Table of Contents
 
 - [Revision status](#revision-status)
-- [Introduction](#1-introduction)
-  - [Scope](#11-scope)
-  - [Audience](#12-audience)
-  - [Reference documents](#13-reference-documents)
-- [Communication channel between a remote host and the Cloud TSP](#2-communication-channel-between-a-remote-host-and-the-cloud-tsp)
+- [Communication channel between a remote host and the Stø Token Service](#2-communication-channel-between-a-remote-host-and-the-cloud-tsp)
 - [Structure and Content of Messages](#3-structure-and-content-of-messages)
   - [Overview of the message structure](#31-overview-of-the-message-structure)
   - [Header](#32-header)
@@ -28,20 +24,20 @@ Copyright © 202 1 Thales .
   - [Data Elements Fields attributes](#35-data-elements-fields-attributes)
   - [Data Elements Coding](#36-data-elements-coding)
 - [List of ISO messages supported](#4-list-of-iso-messages-supported)
-  - [1100 – Detokenization request to the Cloud TSP](#41-1100--detokenization-request-to-the-cloud-tsp)
-  - [1110 – Detokenization request response from the Cloud TSP](#42-1110---detokenization-request-response-from-the-cloud-tsp)
-  - [1120 – Transaction Advice communication to the Cloud TSP (re-tokenization)](#43-1120---transaction-advice-communication-to-the-cloud-tsp-re-)
-  - [1130 – Transaction Advice communication response from the Cloud TSP (re-tokenization)](#44-1130--transaction-advice-communication-response-from-the-cloud-tsp-re-tokenization)
+  - [1100 – Detokenization request to the Stø Token Service](#41-1100--detokenization-request-to-the-cloud-tsp)
+  - [1110 – Detokenization request response from the Stø Token Service](#42-1110---detokenization-request-response-from-the-cloud-tsp)
+  - [1120 – Transaction Advice communication to the Stø Token Service (re-tokenization)](#43-1120---transaction-advice-communication-to-the-cloud-tsp-re-)
+  - [1130 – Transaction Advice communication response from the Stø Token Service (re-tokenization)](#44-1130--transaction-advice-communication-response-from-the-cloud-tsp-re-tokenization)
   - [List of data elements in ISO messages](#5-list-of-data-elements-in-iso-messages)
 - [Requests validation by TSP](#6-requests-validation-by-tsp)
   - [TSP Database](#61-tsp-database)
-    - [1100 – Detokenization request to the Cloud TSP](#611-1100--detokenization-request-to-the-cloud-tsp)
-    - [1120 – Transaction Advice communication to the Cloud TSP (re-tokenization)](#612-1120---transaction-advice-communication-to-the-cloud-tsp-re-tokenization)
-  - [Verification of 1100 – Detokenization request to the Cloud TSP](#62-verification-on-1100-detokenization-request-to-the-cloud-tsp)
+    - [1100 – Detokenization request to the Stø Token Service](#611-1100--detokenization-request-to-the-cloud-tsp)
+    - [1120 – Transaction Advice communication to the Stø Token Service (re-tokenization)](#612-1120---transaction-advice-communication-to-the-cloud-tsp-re-tokenization)
+  - [Verification of 1100 – Detokenization request to the Stø Token Service](#62-verification-on-1100-detokenization-request-to-the-cloud-tsp)
     - [HCE verification flow](#621-hce-verification-flow)
     - [Secure Element verification flow](#622-secure-element-based-verification-flow)
     - [In-app payment cloud cryptogram verification flow](#623-in-app-payment-cloud-cryptogram-verification-flow)
-  - [Verification of 1120 – Transaction Advice communication to the Cloud TSP (re-tokenization)](#63-verification-on-1120---transaction-advice-communication-to-the-cloud-tsp-re-tokenization)
+  - [Verification of 1120 – Transaction Advice communication to the Stø Token Service (re-tokenization)](#63-verification-on-1120---transaction-advice-communication-to-the-cloud-tsp-re-tokenization)
 - [Message Data Elements Description](#7-message-data-elements-description)
 - [Appendix](#8-appendix)
   - [Token Assurance Method codification](#81-token-assurance-method-codification)
@@ -60,14 +56,14 @@ Copyright © 202 1 Thales .
   - [ISO interface](#85-iso-interface)
   - [ISO8583 request/response examples](#86-iso8583-requestresponse-examples)
 
-# Table List
+## Table List
 
 Table 1 - MESSAGE STRUCTURE
 Table 2 - MESSAGE HEADER
 Table 3 - LIST OF ISO MESSAGES SUPPORTED
 Table 4 - FIELDS PRESENCE IN ISO MESSAGES
 
-# Revision status
+## Revision status
 
 | Revision | Date       | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 |---------|------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -92,26 +88,7 @@ Table 4 - FIELDS PRESENCE IN ISO MESSAGES
 | 2.8     | 07/08/2023 | Section 8.7 – Update examples with currently supported message format. <br/> Section 7.18 Move details about tags to appendix.                                                                                                                                                                                                                                                                                                                                                                                                                                                               |                                                                                                                                                                                                                                                                                                                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | 2.9     | 13/08/2025 | Section 8.4 - Improved MAC documentation. <br/> Section 8.7 Include examples of AES CMAC. <br/> Section 3.6 Data Elements Coding - Alphanumeric field - Improved explanation of the example of field 43 <br/> Section 7.15 Field n° 43 – Card Acceptor Name and Address - Improved description of the field. <br/> Section 7.20 Field n° 64 - clarification regarding field length when using CMAC. <br/> Remove section 8.5 Healthcheck interface <br/> Section 7.9 Field n° 22 – POS Data: described case when pan entry mode is invalid                                                   |
 
-# 1 Introduction
-
-The Cloud Token Service Provider is a payment tokenization service providing EMV tokenization or PCI tokenization.
-
-## 1.1 Scope
-
-The present document describes the format of messages exchanged between Cloud TSP and a remote Host (Acquirer server or Bank server).
-
-## 1.2 Audience
-
-The audience of this documents is:
-
-    * POS aggregators connecting to the detokenization interface of the Cloud TSP service
-    * Payment systems implementing tokenization
-
-## 1.3 Reference documents
-
-    * BankAxept. Cloud TSP In-app payment cloud cryptogram.
-
-# 2 Communication channel between a remote host and the Cloud TSP
+## 2 Communication channel between a remote host and the Stø Token Service
 
 The communication channel is specific to each project and must established a secure channel (see 8.3 Connectivity Requirements)
 
@@ -119,9 +96,9 @@ The messages exchanged through this interface are based on ISO 8583 norm. Using 
 
 This document provides a description of thes messages (message structure and the data elements contained in these messages).
 
-# 3 Structure and Content of Messages
+## 3 Structure and Content of Messages
 
-## 3.1 Overview of the message structure
+### 3.1 Overview of the message structure
 
 HTTP is used as transport layer for carrying ISO message payload. HTTP header includes a unique
 transaction ID for a given request and some information related to the payload. HTTP body contains
@@ -148,7 +125,7 @@ Payload includes information specified in table below. Each part is detailed in 
 
 Table 1: Message Structure
 
-## 3.2 Header
+### 3.2 Header
 
 The header is required in all messages. The header value is 8 bytes length.
 It has the following format:
@@ -160,27 +137,27 @@ It has the following format:
 | 2 - 5    | **Request** <br> Release & version of the protocol. <br> 1000: version 1                                                                                                                                                                                                                                                          | 
 |          | **Response** <br> Value is echoed back in response.                                                                                                                                                                                                                                                                               |
 | 6 - 8    | **Request** <br> Always set to 000.                                                                                                                                                                                                                                                                                               |
-|          | **Response** <br> When Cloud TSP rejects a message for format error, this element contains the number of the first erroneous data element. Otherwise, this element contains: ‘000’.                                                                                                                                               |
+|          | **Response** <br> When Stø Token Service rejects a message for format error, this element contains the number of the first erroneous data element. Otherwise, this element contains: ‘000’.                                                                                                                                               |
 
 Table 2 – Message Header
 
-## 3.3 Message type
+### 3.3 Message type
 
 The message type is an element of 4 positions serving to identify the general function of the
 message. This element is mandatory in all the messages.
 
-The following messages are exchanged between Cloud TSP and the remote Host:
+The following messages are exchanged between Stø Token Service and the remote Host:
 
 | Message | Description                                                                     |
 |---------|---------------------------------------------------------------------------------|
-| 1100    | Detokenization request to the Cloud TSP.                                        |
-| 1110    | Detokenization request response from the Cloud TSP.                             |
-| 1120    | Transaction Advice communication to the Cloud TSP (re-tokenization).            |
-| 1130    | Transaction Advice communication response from the Cloud TSP (re-tokenization). |
+| 1100    | Detokenization request to the Stø Token Service.                                        |
+| 1110    | Detokenization request response from the Stø Token Service.                             |
+| 1120    | Transaction Advice communication to the Stø Token Service (re-tokenization).            |
+| 1130    | Transaction Advice communication response from the Stø Token Service (re-tokenization). |
 
 Table 3 – List of ISO messages supported
 
-## 3.4 Primary Bitmap
+### 3.4 Primary Bitmap
 
 The ISO 8583/1993-12-15 uses a messages scheme by bits vector or ‘‘bit maps’’. The bitmap
 structure indicates the presence or absence of data element _(‘1’ inside the bitmap indicates the
@@ -188,7 +165,7 @@ element is present, while ‘0’ indicates the element is absent)_. The bytes i
 from left to right.
 
 The message may support several bitmaps each one has 8 bytes length (64-bit string contained within
-an eight-byte data element), can be used in the messages exchanged with Cloud TSP.
+an eight-byte data element), can be used in the messages exchanged with Stø Token Service.
 
 * A primary bitmap indicates the presence of fields from 1 to 64.
 * A secondary bitmap indicates the presence of fields from 65 to 128.
@@ -227,7 +204,7 @@ element number. The bit value indicates if DE is present (bit=1) or not
 | 49              | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57 | 58 | 59 | 60 | 61 | 62 | 63 | 64 |
 | 1               | 0  | 0  | 0  | 0  | 0  | 1  | 0  | 0  | 0  | 0  | 0  | 0  | 0  | 0  | 1  |
 
-## 3.5 Data Elements Fields attributes
+### 3.5 Data Elements Fields attributes
 
 For each Data Element some attributes are specified according to a particular naming described
 hereafter.
@@ -272,7 +249,7 @@ below:
     LLVAR = variable length field using 2 digits for length information.
     LLLVAR = variable length field using 3 digits for length information.
 
-## 3.6 Data Elements Coding
+### 3.6 Data Elements Coding
 
 Fields with a fixed length:
 
@@ -286,7 +263,7 @@ The length is coded in hexadecimal on 1 byte. So the maximum value for length is
 All the data elements in this document are specified as being numeric (type n), alphanumeric
 (type a, a, and ans) or binary (type b).
 
-#### Numeric field
+##### Numeric field
 
 This field is bcd encoded. The length is expressed as a number of nibbles (half byte). When the
 length is an odd value, the leftmost nible must be ignored. It is used only for padding and equal to
@@ -300,7 +277,7 @@ Example:
     Length: 11 hex = 17 dec = 17 digits
     PAN: 1 2345 6789 0123 4567
 
-#### Alphanumeric field
+##### Alphanumeric field
 
 This field is ASCII encoded. The length is expressed as a number of ASCII characters meaning a
 number of bytes.
@@ -328,7 +305,7 @@ Example:
         “BAX Test / /Paris /FR ”.
     • The trailing space is part of the fixed-length padding to reach exactly 55 bytes.
 
-#### Binary field
+##### Binary field
 
 This field is encoded in hexa. The length is expressed as a number of bytes.
 
@@ -341,21 +318,21 @@ Example:
     c2 ed 0f 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 9f 26 08 a1 a7 17 06 5f f0 30 a3
     Length: 69 hex = 105 dec
 
-# 4 List of ISO messages supported
+## 4 List of ISO messages supported
 
-## 4.1 1100 – Detokenization request to the Cloud TSP
+### 4.1 1100 – Detokenization request to the Stø Token Service
 
-The remote Host is using this message for requesting the Cloud TSP to detokenize a message.
-During the message processing, the Cloud TSP is processing:
+The remote Host is using this message for requesting the Stø Token Service to detokenize a message.
+During the message processing, the Stø Token Service is processing:
 
 * Token domain restriction Controls checks based on the type of token
 * Detokenization
 
 Note: This message corresponds to the “Token Authorization Request” message in the ‘EMV Payment Tokenisation Specification Technical Framework v2.0”.
 
-## 4.2 1110 - Detokenization request response from the Cloud TSP
+### 4.2 1110 - Detokenization request response from the Stø Token Service
 
-The Cloud TSP uses this message for communicating the result of the detokenization request
+The Stø Token Service uses this message for communicating the result of the detokenization request
 message.
 
 It may be either
@@ -367,11 +344,11 @@ It may be either
 Note: This message corresponds to the “PAN Authorization Request” message in the ‘EMV Payment
 Tokenisation Specification Technical Framework v2.0”.
 
-## 4.3 1120 - Transaction Advice communication to the Cloud TSP (re-
+### 4.3 1120 - Transaction Advice communication to the Stø Token Service (re-
 tokenization)
 
 The remote Host is using this message, for communicating the result of the transaction processing to
-the Cloud TSP and to request the Cloud TSP to retokenize a message.
+the Stø Token Service and to request the Stø Token Service to retokenize a message.
 
 The result of transaction processing may be either
 
@@ -379,7 +356,7 @@ The result of transaction processing may be either
 * ‘transaction declined’
 *  or transaction previously approved is reversed’.
 
-During the message processing, the Cloud TSP is processing:
+During the message processing, the Stø Token Service is processing:
 
 * Check related to the PAN value communicated
 * Send notification message to the wallet
@@ -389,9 +366,9 @@ During the message processing, the Cloud TSP is processing:
 Note: This message corresponds to the “PAN Authorization Response” message in the ‘EMV
 Payment Tokenisation Specification Technical Framework v2.0”.
 
-## 4.4 1130 -Transaction Advice communication response from the Cloud TSP (re-tokenization)
+### 4.4 1130 -Transaction Advice communication response from the Stø Token Service (re-tokenization)
 
-The Cloud TSP uses this message for communicating the result of the Transaction Advice
+The Stø Token Service uses this message for communicating the result of the Transaction Advice
 communication request message.
 
 It may be either
@@ -402,7 +379,7 @@ It may be either
 Note: This message corresponds to the “Token Authorization Response” message in the ‘EMV
 Payment Tokenisation Specification Technical Framework v2.0”.
 
-# 5 List of data elements in ISO messages
+## 5 List of data elements in ISO messages
 
 | Field | Description                                                                                                                                | 1100        | 1110         | 1120 | 1130   |
 |-------|--------------------------------------------------------------------------------------------------------------------------------------------|-------------|--------------|------|--------|
@@ -419,7 +396,7 @@ Payment Tokenisation Specification Technical Framework v2.0”.
 | 35    | Track2 Data <br/> PAN value is a Token value and CVV based on token value <br/> PAN value is accurate PAN value and CVV based on PAN value | <br/><br/>O | <br/><br/>C3 | C4   | -      |
 |       |                                                                                                                                            |             | C3           | C4   | .      |
 | 37    | Retrieval reference number                                                                                                                 | M           | C8           | M    | C8     |
-| 39    | Action/Response Code <br> Cloud TSP message processing result                                                                              | -           | M            |      | M      |
+| 39    | Action/Response Code <br> Stø Token Service message processing result                                                                              | -           | M            |      | M      |
 |       | Issuer Authorization Response Code                                                                                                         |             |              | M    |        |
 | 42    | Card Acceptor Identification Code                                                                                                          | M*          | -            | M*   | -      |
 | 43    | Card Acceptor Name and Address                                                                                                             | M           | -            | M    | -      |
@@ -433,11 +410,11 @@ Table 4 – Fields presence in ISO messages
 
 | Code | Description                                                                                                                                                                                                                                                              |
 |------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| C1   | Present only when the Cloud TSP has processed the message request without error.                                                                                                                                                                                         |
+| C1   | Present only when the Stø Token Service has processed the message request without error.                                                                                                                                                                                         |
 | C2   | required when the transaction is performed using a chip payment application \[Field 22 position 1 equals to 05, 07 or 08] except for “Type 2” transactions described in section 6.1.1 (for these types of transaction, the presence of field 55 is optional).            |
-| C3   | Present when Track2 Data is present in 1100 message. The value returned is using a PAN value that is either the echo of the PAN value present in the request message or the PAN value result of the detokenization (For details, see 6 Requests validation by Cloud TSP) |
+| C3   | Present when Track2 Data is present in 1100 message. The value returned is using a PAN value that is either the echo of the PAN value present in the request message or the PAN value result of the detokenization (For details, see 6 Requests validation by Stø Token Service) |
 | C4   | This field must be set to the value of the equivalent parameter present in the de-tokenization response (1110) message.                                                                                                                                                  |
-| C5   | This field is always present. Its value may be either the echo of the value present in the request message or the PAN-related value result of the detokenization (For details, see 6 Requests validation by Cloud TSP).                                                  |
+| C5   | This field is always present. Its value may be either the echo of the value present in the request message or the PAN-related value result of the detokenization (For details, see 6 Requests validation by Stø Token Service).                                                  |
 | C6   | Presence recommended when Field 55 is present (when not present, the TSP must use the ‘00’ default value in cryptographic algorithm)                                                                                                                                     |
 | C7   | Presence is depending on project business requirements.                                                                                                                                                                                                                  |
 | C8   | Presence is depending on project business requirements.                                                                                                                                                                                                                  |
@@ -445,12 +422,12 @@ Table 4 – Fields presence in ISO messages
 | M    | Mandatory.                                                                                                                                                                                                                                                               |
 | M\*  | Field currently mandatory. Proposition: If these fields are not currently used, they may be either removed from the document or become optional.                                                                                                                         |
 
-# 6 Requests validation by TSP
+## 6 Requests validation by TSP
 
 TSP performs a number of verifications on reception of 1100 and 1120 request messages using
 information available at TSP level.
 
-## 6.1 TSP Database
+### 6.1 TSP Database
 
 When processing a message request, the TSP is using as a database either
 
@@ -463,7 +440,7 @@ value present in the origin transaction.
 
 The type of “database” used by the TSP is depending on the type of request message.
 
-### 6.1.1 1100 – Detokenization request to the Cloud TSP
+#### 6.1.1 1100 – Detokenization request to the Stø Token Service
 
 The TSP is capable to process two types of de-tokenization request:
 
@@ -487,15 +464,15 @@ when the transaction is a chip transaction.
 Note 2: 1100 is optional for these use cases. The 1120 message (Advise) can be sent without 1100 if detokenization,
 meaning PAN knowledge, is not required.
 
-### 6.1.2 1120 - Transaction Advice communication to the Cloud TSP (re-tokenization)
+#### 6.1.2 1120 - Transaction Advice communication to the Stø Token Service (re-tokenization)
 
 The TSP looks up a detokenization request in TSP Transaction History File by using TDT+RRN value as transaction ID. The
 token tied to the transaction ID is used to look up PAN in token vault. TSP checks PAN in token vault matches PAN in
 1120 – Advice Message else an error is returned in Advice response
 
-## 6.2 Verification on 1100 –Detokenization request to the Cloud TSP
+### 6.2 Verification on 1100 –Detokenization request to the Stø Token Service
 
-### 6.2.1 HCE verification flow
+#### 6.2.1 HCE verification flow
 
 **Note**: this flow applies to any digital wallet that is based on host-card-emulation (HCE) framework and applies
 software security measures such as single-use-key. Such wallets include Samsung Pay, Google Pay, and proprietary HCE
@@ -533,7 +510,7 @@ wallets.
 |         |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |                  |                |
 | 3.2.11  | Message verified OK                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | PAN              | 000            |
 
-### 6.2.2 Secure Element-based verification flow
+#### 6.2.2 Secure Element-based verification flow
 
 |         | TSP Check                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Field (02,14,35) | Field 39 value |
 |---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------|----------------|
@@ -563,9 +540,9 @@ wallets.
 
 This behavior (option 1 or option 2) is configurable per customer (domestic scheme or any closed loop environment).
 
-### 6.2.3 In-app payment cloud cryptogram verification flow
+#### 6.2.3 In-app payment cloud cryptogram verification flow
 
-The in-app payment cloud cryptograms is a functionality provided by Cloud TSP for PSD2 compliance. The overview of the
+The in-app payment cloud cryptograms is a functionality provided by Stø Token Service for PSD2 compliance. The overview of the
 functionality and format of the cryptograms is described in (1).
 
 This flow is enabled by a configuration per customer. For customers in which enabled, the identification of the
@@ -604,7 +581,7 @@ applicability of the flow is performed by Field 22, Sub-field 1 PAN Entry Mode b
 
 This behavior (option 1 or option 2) is configurable per customer (domestic scheme or any closed loop environment)
 
-## 6.3 Verification on 1120 - Transaction Advice communication to the Cloud TSP (re-tokenization)
+### 6.3 Verification on 1120 - Transaction Advice communication to the Stø Token Service (re-tokenization)
 
 |         | TSP Check                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Notification sent | Field (02,14,35) | Field 39 value |
 |---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|------------------|----------------|
@@ -635,19 +612,19 @@ This behavior (option 1 or option 2) is configurable per customer (domestic sche
 | 3.2.4   | Request the TSH to send a notification message to the mobile. <br/> The values for transactionType and transactionResult follow: <br/> <table><th>Field 03 position 1-2</th><th>Field 39</th><th>Transaction Type</th><th>Transaction Result</th><tr><td>'00'</td><td>'00' <br/> not '00'</td><td>PURCHASE</td><td>APPROVED <br/> DECLINED</td></tr><tr><td>'20'</td><td>'00' <br/> not '00'</td><td>REFUND</td><td>APPROVED <br/> DECLINED</td></tr><tr><td>'22'</td><td>'00' <br/> not '00'</td><td>PURCHASE</td><td>APPROVED <br/> DECLINED</td></tr><tr><td>'52'</td><td>'00' <br/> not '00'</td><td>PURCHASE</td><td>APPROVED <br/> DECLINED</td></tr><tr><td>'92'</td><td>'00' <br/> not '00'</td><td>PURCHASE</td><td>APPROVED <br/> DECLINED</td></tr></table> | Yes               | DPAN             | 000            |
 
 
-# 7 Message Data Elements Description
+## 7 Message Data Elements Description
 
-This section provides detailed descriptions of all data elements used by Cloud TSP / Remote Host
+This section provides detailed descriptions of all data elements used by Stø Token Service / Remote Host
 Interface messages.
 
-## 7.1 Field n° 02 – Primary Account Number
+### 7.1 Field n° 02 – Primary Account Number
 
 |                 |                                                                                                                                                                                                                                  |
 |-----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Attribute**   | LLVAR; n... 19                                                                                                                                                                                                                   |
-| **Description** | The primary account number is a number used to identify a customer account. It may be either the PAN value associated to the card issued by the Issuer or the token value generated by the Cloud TSP during card digitalisation. |
+| **Description** | The primary account number is a number used to identify a customer account. It may be either the PAN value associated to the card issued by the Issuer or the token value generated by the Stø Token Service during card digitalisation. |
 
-## 7.2 Field n° 03 – Processing Code
+### 7.2 Field n° 03 – Processing Code
 
 |                                          |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 |------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -655,49 +632,49 @@ Interface messages.
 | **Description**                          | Code used to describe the impact of a transaction on the client and related accounts.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | **Values** <br/> (Value to be confirmed) | **Positions 1-2: Transaction Type Code** <br/> 00: Purchases & Services <br/> 01: Withdrawal <br/> 02: Adjustment <br/> 09: Purchase with cashback <br/> 11: Quasi cash <br/> 12: Manual cash <br/> 17: Cash advance <br/> 19: Fees <br/> 20: Refunds <br/> 22: Reversal <br/> 28: MoneySend (MS) <br/> 31: Balance request <br/> 36: Cash balance inquiry <br/> 40: Transfer request <br/> 52: Credit – Return of goods <br/> 91: Status Check <br/> 92: Confirmation of a pre-authorization <br/> 93: Card on File Token Processing <br/> 96: Purchase at ATM <br/> <br/> **Positions 3-4: Account Type (source)** <br/> 00: Not specified <br/> 10: Savings account <br/> 20: Checking account <br/> 30: Credit card account <br/> 38: Loan account <br/> 40: Universal account <br/> **Positions 5-6: Account Type (destination)** <br/> 00: Not specified <br/> 10: Savings account <br/> 20: Checking account <br/> 30: Credit card account <br/> 38: Loan account <br/> 40: Universal account <br/> |
 
-## 7.3 Field n° 04 – Transaction Amount
+### 7.3 Field n° 04 – Transaction Amount
 
 |                 |                                                                                                                                                                                                                   |
 |-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Attribute**   | n-12                                                                                                                                                                                                              |
 | **Description** | Transaction amount in local currency in the the smallest unit associated to the currency (for example, in cents with Euro currency), right justified with leading  zeros, eg: 00 00 00 00 21 00 is coding for 21€ |
 
-## 7.4 Field n° 07 –Transaction Date and Time
+### 7.4 Field n° 07 –Transaction Date and Time
 
 |                 |                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 |-----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Attribute**   | n-10                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | **Description** | Transaction date and time, expressed in Coordinated Universal Time (UTC) or local time, at which the transaction takes place at the point of card acceptor location. The format is MMDDhhmmss. TSP does not know if timestamp is in UTC or local time, Therefore all transactions must be expressed in the same way (UTC or local time) for a given domestic scheme or closed loop environment (eg: closed loop payment for a retailer). |
 
-## 7.5 Field n° 12 – Date and Time Local Transaction
+### 7.5 Field n° 12 – Date and Time Local Transaction
 
 |                 |                                                                                                                 |
 |-----------------|-----------------------------------------------------------------------------------------------------------------|
 | **Attribute**   | n-14                                                                                                            |
 | **Description** | The date and timestamp of the transaction at the card acceptor location. Format of the field is CCYYMMDDhhmmss. |
 
-## 7.6 Field n° 14 – Expiration Date
+### 7.6 Field n° 14 – Expiration Date
 
 |                 |                                                                                                                                                                                                               |
 |-----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Attribute**   | n-4                                                                                                                                                                                                           |
-| **Description** | The expiration date of the payment product. It may be either the expiration date of the card issued by the Issuer or the expiration date of the token generated by  the Cloud TSP during card digitalisation. |
+| **Description** | The expiration date of the payment product. It may be either the expiration date of the card issued by the Issuer or the expiration date of the token generated by  the Stø Token Service during card digitalisation. |
 
-## 7.7 Field n° 18 – Merchant Type
+### 7.7 Field n° 18 – Merchant Type
 
 |                 |                                                                                                                                                                                                                                                                                                       |
 |-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Attribute**   | n-4                                                                                                                                                                                                                                                                                                   |
 | **Description** | Classification of the merchant type of business or service. It allows the bank to identify the transaction type that takes place. In general, values must be compliant with ISO 18245. The following values are defined for Transit use case: <br/> 4784 <br/> 7523 <br/> 4111 <br/> 4131 <br/> 4112. |
 
-## 7.8 Field n° 19 – Acquiring Institution Country Code
+### 7.8 Field n° 19 – Acquiring Institution Country Code
 
 |                 |                                                                                                                                     |
 |-----------------|-------------------------------------------------------------------------------------------------------------------------------------|
 | **Attribute**   | n-3                                                                                                                                 |
 | **Description** | Code of the country where the acquiring institution is located. Refer to the ISO 3166 specification for more information, eg: 02 53 |
 
-## 7.9 Field n° 22 – POS Data
+### 7.9 Field n° 22 – POS Data
 
 |                                          |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 |------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -706,51 +683,51 @@ Interface messages.
 | **Values** <br/> (Value to be confirmed) | **Field 01: PAN Entry Mode** <br/> 0: Unknown <br/> 01: PAN manual entry <br/> 02: PAN read in Magnetic stripe <br/> 03: PAN read in Magnetic stripe (fallback to chip reading issue) <br/> 04: PAN read in QR code <br/> 05: PAN read in contact chip <br/> 06: PAN/Token entry via electronic commerce with optional AAV <br/> 07: PAN read in contactless chip <br/> 08: PAN/Token entry via electronic commerce containing cryptogram in field 55 <br/> **Field 02: Terminal PIN Entry Mode** <br/> 0: Unknown <br/> 1: Terminal has PIN entry capability <br/> 2: Terminal does not have PIN entry capability <br/> Coding example: <br/> 00 51 <br/> Field 01: 05 - PAN read in contact chip <br/> Field 02: 1 - Terminal has PIN entry capability <br/> |
 | **Note**                                 | It is crucial to validate the PAN Entry Mode. Transactions received with an unexpected or unsupported PAN Entry Mode should be rejected to prevent processing errors or potential fraud. Only accept transactions with explicitly supported PAN Entry Modes as per your system requirements. In case of invalid pan entry mode, response code 006 "Message Format error" is returned                                                                                                                                                                                                                                                                                                                                                                           |
 
-## 7.10 Field n° 23 – Card Sequence Number
+### 7.10 Field n° 23 – Card Sequence Number
 
 |                 |                                                                                          |
 |-----------------|------------------------------------------------------------------------------------------|
 | **Attribute**   | n-3                                                                                      |
 | **Description** | Allows distinguishing between separate cards related to the same primary account number. |
 
-## 7.11 Field n° 35 - Track2 Data
+### 7.11 Field n° 35 - Track2 Data
 
 |                 |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 |-----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Attribute**   | LLVAR ans... 37                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| **Description** | Track 2 data compliant with ISO 7813, excluding the start and end sentinels and the LRC. The PAN value in Track2 Data is either the PAN value associated to the card issued by the Issuer or the token value generated by the Cloud TSP during card digitalisation. <br/> For chip transactions, DE 35 carries data read from the chip as EMV tag 57 (Track 2 Equivalent Data). The account number in DE 2 (Primary Account  Number [PAN]) must match the account number in DE 35. |
+| **Description** | Track 2 data compliant with ISO 7813, excluding the start and end sentinels and the LRC. The PAN value in Track2 Data is either the PAN value associated to the card issued by the Issuer or the token value generated by the Stø Token Service during card digitalisation. <br/> For chip transactions, DE 35 carries data read from the chip as EMV tag 57 (Track 2 Equivalent Data). The account number in DE 2 (Primary Account  Number [PAN]) must match the account number in DE 35. |
 
 
-## 7.12 Field n° 37 - Retrieval reference number
+### 7.12 Field n° 37 - Retrieval reference number
 
 |                 |                                                                                            |
 |-----------------|--------------------------------------------------------------------------------------------|
 | **Attribute**   | an-12                                                                                      |
 | **Description** | Unique reference used to retrieve the original messages and used to help find these data   |
 
-## 7.13 Field n° 39 – Action/Response Code
+### 7.13 Field n° 39 – Action/Response Code
 
 |                 |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 |-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Attribute**   | n-3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| **Description** | The code value must be part of full successful/error code list below else an error is returned by TSP. <br/> TSP notifies TSH and therefore the wallet in case of failed payment only for error code listed below. Any other value included in Advise message does not trigger payment notification to TSH and wallet. <br/> <br/> a) In 1120 message not related to a reversal or refund message. <br/> When the message 1120 message is processed without any error: <br/> If 1120 field 39 is 000: <br/> - A notification is sent to the TSH with transaction result APPROVED. <br/> - 1130 response code will be 000 if no further error is found by processing the request <br/> If 1120 field 39 is one of the list above except 000: <br/> - A notification is sent to the TSH with transaction result DECLINED. <br/> - 1130 response code will be 000 if no further error is found by processing the request <br/> If 1120 field 39 was NOT one of the list above: <br/> - No notification is sent to the TSH <br/> - 1130 response code will be 006. Header field in HTTP header will state field number 039 if this inconsistency on field 39 if the first one experienced by TSP during ISO message validation (see 3.2) <br/> When the message 1120 message is processed with error: <br/> - No notification is sent to the TSH <br/> - 1130 response code will be set to the value associated to the error <br/> <br/> b) In 1120 message related to a reversal message (Processing Code (field 03) position 1-2 is equal to ’22- reversal’ and Response Code (field 39)=000 <br/> When the message 1120 message is processed without any error: <br/> - A notification is sent to the TSH with transactionType= PURCHASE, and transactionResult = REFUNDED. <br/> - 1130 response code will be 000 <br/> When the message 1120 message is processed with error: <br/> - No notification is sent to the TSH <br/> - 1130 response code will be set to the value associated to the error <br/> <br/> c) In 1120 message related to a refund message (Processing Code (field 03) position 1-2 is equal to ’20- refund’ and Response Code (field 39)=000 ) <br/> When the message 1120 message is processed without any error: <br/> - A notification is sent to the TSH with transactionType = REFUND transactionResult = APPROVED. <br/> - 1130 response code will be 000 <br/> <br/> When the message 1120 message is processed with error: <br/> - No notification is sent to the TSH <br/> - 1130 response code will be set to the value associated to the error <br/> <br/> e) In 1120 message related to a refund message (Processing Code (field 03) position 1-2 is equal to ’52- Credit – Return of goods and Response Code (field 39)=000 ) <br/> <br/> When the message 1120 message is processed without any error: <br/> - A notification is sent to the TSH with transactionType = PURCHASE transactionResult = REFUNDED. <br/> - 1130 response code will be 000 <br/> <br/> When the message 1120 message is processed with error: <br/> ssed with error: <br/> - 1130 response code will be set to the value associated to the error <br/> <br/> e) In 1110 message and 1130 message, it corresponds to Cloud TSP message processing result |
+| **Description** | The code value must be part of full successful/error code list below else an error is returned by TSP. <br/> TSP notifies TSH and therefore the wallet in case of failed payment only for error code listed below. Any other value included in Advise message does not trigger payment notification to TSH and wallet. <br/> <br/> a) In 1120 message not related to a reversal or refund message. <br/> When the message 1120 message is processed without any error: <br/> If 1120 field 39 is 000: <br/> - A notification is sent to the TSH with transaction result APPROVED. <br/> - 1130 response code will be 000 if no further error is found by processing the request <br/> If 1120 field 39 is one of the list above except 000: <br/> - A notification is sent to the TSH with transaction result DECLINED. <br/> - 1130 response code will be 000 if no further error is found by processing the request <br/> If 1120 field 39 was NOT one of the list above: <br/> - No notification is sent to the TSH <br/> - 1130 response code will be 006. Header field in HTTP header will state field number 039 if this inconsistency on field 39 if the first one experienced by TSP during ISO message validation (see 3.2) <br/> When the message 1120 message is processed with error: <br/> - No notification is sent to the TSH <br/> - 1130 response code will be set to the value associated to the error <br/> <br/> b) In 1120 message related to a reversal message (Processing Code (field 03) position 1-2 is equal to ’22- reversal’ and Response Code (field 39)=000 <br/> When the message 1120 message is processed without any error: <br/> - A notification is sent to the TSH with transactionType= PURCHASE, and transactionResult = REFUNDED. <br/> - 1130 response code will be 000 <br/> When the message 1120 message is processed with error: <br/> - No notification is sent to the TSH <br/> - 1130 response code will be set to the value associated to the error <br/> <br/> c) In 1120 message related to a refund message (Processing Code (field 03) position 1-2 is equal to ’20- refund’ and Response Code (field 39)=000 ) <br/> When the message 1120 message is processed without any error: <br/> - A notification is sent to the TSH with transactionType = REFUND transactionResult = APPROVED. <br/> - 1130 response code will be 000 <br/> <br/> When the message 1120 message is processed with error: <br/> - No notification is sent to the TSH <br/> - 1130 response code will be set to the value associated to the error <br/> <br/> e) In 1120 message related to a refund message (Processing Code (field 03) position 1-2 is equal to ’52- Credit – Return of goods and Response Code (field 39)=000 ) <br/> <br/> When the message 1120 message is processed without any error: <br/> - A notification is sent to the TSH with transactionType = PURCHASE transactionResult = REFUNDED. <br/> - 1130 response code will be 000 <br/> <br/> When the message 1120 message is processed with error: <br/> ssed with error: <br/> - 1130 response code will be set to the value associated to the error <br/> <br/> e) In 1110 message and 1130 message, it corresponds to Stø Token Service message processing result |
 | **Values**      | <table><tr><th>Code</th><th>Description</th></tr><tr><td>'000'</td><td>Transaction or request approved</td></tr><tr><td>'001'</td><td>Expired card</td></tr><tr><td>‘002'</td><td>Bad Merchant</td></tr><tr><td>'003'</td><td>Unknown Card or wrong card status</td></tr><tr><td>'004'</td><td>Terminal Transaction not permitted</td></tr><tr><td>'005'</td><td>Cryptographic checks failure (wrong ARQC cryptogram)</td></tr><tr><td>'006'</td><td>Message Format error</td></tr><tr><td>'007'</td><td>Invalid amount</td></tr><tr><td>'008'</td><td>Insufficient funds/over credit limit (token domain control)</td></tr><tr><td>'009'</td><td>Duplicate transmission detected</td></tr><tr><td>'010'</td><td>System error</td></tr><tr><td>'011'</td><td>Lost card</td></tr><tr><td>'012'</td><td>Stolen card</td></tr><tr><td>'013'</td><td>Suspect fraud</td></tr><tr><td>'014'</td><td>Cryptographic Key not supported</td></tr><tr><td>'015'</td><td>Wrong Field 55 format</td></tr><tr><td>'016'</td><td>Cryptogram expired (specific to QR Code project)</td></tr><tr><td>'017'</td>Amount in the message field not within allowable limits derived from amount in field 55<td></td></tr><tr><td>'018'</td><td>Currency code in the message field does not match currency code in field 55</td></tr><tr><td>'019'</td><td>Local Verification Results check failed (Apple Pay)</td></tr><tr><td>'020'</td><td>Required CDCVM stamp is missing</td></tr><tr><td>'021'</td><td>CDCVM Stamp checking failure</td></tr><tr><td>'024'</td><td>RFU (Required Cloud PIN stamp is missing)</td></tr><tr><td>'025'</td><td>RFU (Cloud PIN stamp Stamp checking failure)</td></tr><tr><td>'029'</td><td>Cloud PIN not supported (Cloud PIN was used but it is not supported)</td></tr><tr><td>'030'</td><td>ATC Check failure</td></tr></table>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 
-## 7.14 Field n° 42 – Card Acceptor Identification Code
+### 7.14 Field n° 42 – Card Acceptor Identification Code
 
 |                 |                                                                                                                                                                                                                                                      |
 |-----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Attribute**   | ans-15                                                                                                                                                                                                                                               |
 | **Description** | The card acceptor defines the point of the transaction in both local and interchange environments. It is is used as a merchant ID to uniquely identify the merchant in a POS transaction. The field is left justified with spaces on right positions |
 
-## 7.15 Field n° 43 – Card Acceptor Name and Address
+### 7.15 Field n° 43 – Card Acceptor Name and Address
 
 |                 |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 |-----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Attribute**   | ans-55                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | **Description** | Field 43 provides information about the merchant or entity accepting the card. This helps banks, processors, and card networks identify where a transaction took place. <br/> Typical Uses: <br/> - Merchant Identification: Shows the name and address of the business where the card was used. <br/> - Location Tracking: Includes details like city, ZIP code, and country, which are useful for fraud detection and transaction analysis. <br/> - Receipts and Statements: The information in Field 43 often appears on customer receipts and account statements.<br/>Card Acceptor Name and Address is using the following structure composed of 7 sub-fields <br/> <table> <tr><th>#</th><th>Attributes</th><th>Description</th></tr> <tr><td>1</td><td>ans-22</td><td>Card Acceptor Name</td></tr> <tr><td>2</td><td>ans-1</td><td>Separator value: '/'</td></tr> <tr><td>3</td><td>ans-5</td><td>Card Acceptor ZIP code</td></tr> <tr><td>4</td><td>ans-1</td><td>Separator value: '/'</td></tr> <tr><td>5</td><td>ans-22</td><td>Card Acceptor Location City</td></tr> <tr><td>6</td><td>ans-1</td><td>Separator value: '/'</td></tr> <tr><td>7</td><td>ans-3</td><td>Card Acceptor state/Province/country Code location</td></tr> </table> </br> [See example, Field n° 43](#alphanumeric-field) |
 
-## 7.16 Field n° 48 – Additional data, private
+### 7.16 Field n° 48 – Additional data, private
 
 |                 |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 |-----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -758,14 +735,14 @@ Interface messages.
 | **Description** | Dedicated to the storage of additional data.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | **Values**      | The data element field is composed of the concatenation of several sub-fields. Each subfield has the following structure: <br/> * Sub-field Identifier (3 characters) <br/> * Sub-field Length (3 characters) <br/> * Sub-field value (x characters with x= Sub-field Length) <br/> <br/> The most frequently field 48 sub-field used are from the following list. <br/> <table> <tr> <th>Identifier</th> <th>Length</th> <th>Value</th> <th>Presence in messages</th></tr> <tr> <td>'001'</td> <td>'002'</td> <td>Encrypted key Index to key used for encrypting MAC key. This value must be unique per processor. Hexadecimal characters in the range 0–9 and A–F. <br/> See MAC details</td> <td>Presence is required only when field 64 is present</td></tr> <tr> <td>'002'</td> <td>'032'</td> <td>MAC key: element containing 32 hexadecimal characters in the range 0–9 and A–F to represent the 16 bytes of a MAC key encrypted under the encryption key associated to the index. <br/> See MAC details</td> <td>Presence is required only when field 64 is present</td></tr> <tr> <td>'003'</td> <td>'003'</td> <td>CVV2 value on 3 digits</td> <td>Currently not used</td></tr> <tr> <td>'004'</td> <td>'032'</td> <td>AAV</td> <td>Currently not used</td></tr> <tr> <td>'005'</td> <td>Variable up to 32</td> <td>Archive Reference <br/> up to 32 Alphanumeric characters A-Z , a-z , 0-9 , space and special characters</td> <td>Conditional in 1110 and 1130 <br/> Presence is depending on project business requirements (use for recurring payment)</td></tr> <tr> <td>'006'</td> <td>'001'</td> <td>Transaction Category Code (TCC) <br/> One character indicating the type of the transactions. <br/> Corresponding values are listed: <br/> <table> <tr><th>Value</th><th>Description</th></tr> <tr><td>A</td><td>Car rental</td></tr> <tr><td>H</td><td>Hotel</td></tr> <tr><td>R</td><td>Retail sale</td></tr> <tr><td>M</td><td>MOTO (mail order or telephone order)</td></tr> <tr><td>X</td><td>Public transport services</td></tr> </table> </td> <td>Conditional. Presensce is only required in case of transit transaction for TSP to handle transit-specific processing. <br/> In other cases it is optional. If present, TSP will store it as a transaction attribute. No impact on the processing by TSP</td> </tr> <tr> <td>'007'</td> <td>Variable</td> <td>Acquirer Institution Id from request.</td> <td>Conditional in 1110 and 1130 echoing request. Presence is depending on project business requirements.</td></tr> </table> <br/> Coding example: <br/> 40 30 30 31 30 30 32 30 31 30 30 32 30 33 32 32 34 34 37 32 36 44 37 30 31 39 30 36 43 30 <br/> 38 35 46 39 37 37 41 39 34 31 36 36 43 35 35 46 33 30 30 35 30 31 32 31 31 41 41 32 32 42 <br/> 42 33 33 43 43 <br/> ASCII decoded and identifier shown in bold: <br/> Length = 40 hex = 64 dec <br/> 001 002 01 002 032 244726D701906C085F977A94166C55F3 005 012 11AA22BB33CC |
 
-## 7.17 Field n° 49 – Transaction Currency Code
+### 7.17 Field n° 49 – Transaction Currency Code
 
 |                 |                            |
 |-----------------|----------------------------|
 | **Attribute**   | n-3                        |
 | **Description** | Local transaction currency |
 
-## 7.18 Field n° 55 – Chip Related Data
+### 7.18 Field n° 55 – Chip Related Data
 
 |                 |                                                                                               |
 |-----------------|-----------------------------------------------------------------------------------------------|
@@ -773,7 +750,7 @@ Interface messages.
 | **Description** | Contains data related to ICC systems related to the card.                                     |
 | **Values**      | The data element value field is BER-TLV structured as defined in EMV specifications Book 3.   |
 
-## 7.19 Field n° 56 – Token Related Data
+### 7.19 Field n° 56 – Token Related Data
 
 |                 |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 |-----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -786,16 +763,16 @@ Interface messages.
 (1) The device brand and model are dependant of information provided by the wallet. One of both or both fields may be not populated by the wallet.
 (2) RFU and subject to availability of the suitable information from the wallet.
 
-## 7.20 Field n° 64 – Message Authentication Code
+### 7.20 Field n° 64 – Message Authentication Code
 
 |                 |                                                                                                                                                                             |
 |-----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Attribute**   | b-8 OR b-16                                                                                                                                                                 |
 | **Description** | Message Authentication Code [MAC]) validates the source and the text of the message between the sender and the receiver. Note that when using CMAC, the field is binary 16. |
 
-# 8 Appendix
+## 8 Appendix
 
-## 8.1 Token Assurance Method codification
+### 8.1 Token Assurance Method codification
 
 The values are defined in the document: “Token Authorization Response” message in the ‘EMV Payment Tokenisation
 Specification Technical Framework v2.0”.
@@ -818,7 +795,7 @@ Specification Technical Framework v2.0”.
 | **20 - 89**                     | **Token Programme Specific**                                            |
 | **99 - 99**                     | **Reserved for future EMVCo use**                                       |
 
-## 8.2 Storage Type
+### 8.2 Storage Type
 
 Attributes of the device that may be used to identify the specific device where a Payment Token is stored.
 
@@ -831,11 +808,11 @@ Attributes of the device that may be used to identify the specific device where 
 | 05           | SE                                  |
 | 06           | Virtual execution environment (VEE) |
 
-## 8.3 Connectivity Requirements
+### 8.3 Connectivity Requirements
 
-A secure channel must be established between the Cloud TSP and the remote Host (Acquirer server  or Bank server) as described below.
+A secure channel must be established between the Stø Token Service and the remote Host (Acquirer server  or Bank server) as described below.
 
-### 8.3.1 TLS Authentication (HTTPS)
+#### 8.3.1 TLS Authentication (HTTPS)
 
 The TLS shall be used to get end-to-end encryption.
 If VPN is used, TLS shall be TLS server authentication otherwise TLS mutual authentication.
@@ -848,18 +825,18 @@ The full ISO payload will be exchanged using HTTP Request/Response scheme:
   * content type: “x-www-form-urlencoded”
   * The full full byte array ISO message request is Base64 encoded and present in the Body Request
 * HTTP Response
-  * It contains the synchronous ISO message Response from Cloud TSP.
+  * It contains the synchronous ISO message Response from Stø Token Service.
   * The full byte array ISO message response is Base64 encoded in present in the Body Response.
   * HTTP Status code
-    * 200 if Cloud TSP decodes and parses the ISO message Request. Response will contain the ISO message Response
-    * 4xx if Cloud TSP fails to decode and parse ISO message. No ISO message will be present.
+    * 200 if Stø Token Service decodes and parses the ISO message Request. Response will contain the ISO message Response
+    * 4xx if Stø Token Service fails to decode and parse ISO message. No ISO message will be present.
     * 5xx connection error. No ISO message will be present.
 
-### 8.3.2 MAC usage
+#### 8.3.2 MAC usage
 
 Usage of MAC is required in all ISO Message (Request and Response). See MAC details
 
-## 8.4 MAC details
+### 8.4 MAC details
 
 Prerequisites for MAC usage:
 * A ZMK (Zone Master Key) has been exchanged between the parties during a key ceremony and imported into HSM.
@@ -870,7 +847,7 @@ The following principles shall be applied for all ISO messages:
 * All ISO messages should contain a MAC session key.
 * The MAC session key is protected under the MAC KEK.
 
-### 8.4.1 MAC KEK
+#### 8.4.1 MAC KEK
 
 The MAC KEK serves as the cryptographic key responsible for encrypting the MAC session key.
 During the setup phase, the MAC KEK must be securely exchanged between the parties, protected under the ZMK.
@@ -879,19 +856,19 @@ Its cryptographic period is defined as either a maximum length of time or a maxi
 Upon the expiration of the cryptographic period, the MAC KEK must be renewed.
 The MAC KEK is identified by a key index (ranging from 1 to 255) to allow for key renewal. The key index is present in the ISO Message in Field n° 48 – Additional data, private (Identifier “001”, the encrypted key index).
 
-### 8.4.2 MAC session key
+#### 8.4.2 MAC session key
 
 The MAC session key is an ephemeral key used to calculate the MAC.
 The MAC session key, encrypted under the MAC KEK, shall be present in each ISO message, located in Field n° 48 – Additional data, private (Identifier "002", the MAC key).
 The MAC session key is generated by each party and can be reused in multiple ISO messages. The maximum recommended lifetime for an ephemeral MAC session key is one hour.
 
-### 8.4.3 MAC
+#### 8.4.3 MAC
 
 MAC shall be computed for each ISO Message and put in Field n° 64 – Message Authentication Code.
 Input data to calculate the MAC is the hash of the full ISO payload encoded to bytes excluding the mac value field (Field 64).
 **Note:** SHA-256 hash is used by default. SHA-1 hash can be used under request.
 
-### 8.4.4 Message transformations
+#### 8.4.4 Message transformations
 
 The transformation is applied to the message and the output from the transformation is input to the
 MAC algorithm. The following transformations are supported:
@@ -900,7 +877,7 @@ MAC algorithm. The following transformations are supported:
 * SHA-256
 * None
 
-### 8.4.5 MAC algorithms
+#### 8.4.5 MAC algorithms
 
 The following algorithms are supported:
 
@@ -910,7 +887,7 @@ The following algorithms are supported:
 
 
 
-### 8.4.6 Key types and algorithms - 3DES (Note: 3DES not supported for new projects)
+#### 8.4.6 Key types and algorithms - 3DES (Note: 3DES not supported for new projects)
 
 |                          |                                                                                                                                                                                                                                                                                    |
 |--------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -920,7 +897,7 @@ The following algorithms are supported:
 | MAC                      | MAC Algorithm 3 (ISO 9797-1 Algorithm 3). Padding method 1 is used: input data is completed with `0`s until the data reaches a multiple of 8-byte blocks. No `0` is added if the input is already a multiple of 8-byte blocks. <br/> The MAC is the 8 leftmost bytes of the output |
 (*) MAC KEK key length depends to remote Host capability
 
-### 8.4.7 Key types and algorithms - AES
+#### 8.4.7 Key types and algorithms - AES
 
 |                          |                                                                                                                                     |
 |--------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
@@ -930,7 +907,7 @@ The following algorithms are supported:
 | MAC                      | AES-CMAC Algorithm (RFC 4493), with padding as defined in the AES-CMAC specification The MAC is the 8 leftmost bytes of the output. |
 
 
-## 8.5 ISO interface
+### 8.5 ISO interface
 
 ISO message are carried over HTTP.
 
@@ -940,18 +917,18 @@ URL is formatted as below, the actual URL will be provided:
 
   https://<domain name>/gtotx/api/iso/<scheme>/v10/msg/<processor>
 
-## 8.6 ISO8583 request/response examples
+### 8.6 ISO8583 request/response examples
 
-The following examples illustrate the ISO8583 request/response messages that are exchanged between the remote host and the Cloud TSP.
+The following examples illustrate the ISO8583 request/response messages that are exchanged between the remote host and the Stø Token Service.
 
-### 8.6.1 Detokenization using 3DES MAC
+#### 8.6.1 Detokenization using 3DES MAC
 
-### Detokenization Request:
+#### Detokenization Request:
 
-A detokenization request is sent by the remote host to the Cloud TSP to retrieve the PAN from a token. This example calculates the MAC using
+A detokenization request is sent by the remote host to the Stø Token Service to retrieve the PAN from a token. This example calculates the MAC using
 a 2KEY 3DES MAC session key and SHA-256 hash for the message transformation. Field-55 is from a PURE wallet.
 
-#### HTTP dump
+##### HTTP dump
 
 ```
 POST /gtotx/api/iso/stoepay/v10/msg/stoepay HTTP/1.1
@@ -965,7 +942,7 @@ Content-Length: 412
 EQByBGYACGGCAREGAyABBIYgGWEAAAAAAAAAIQAGBQYBQygJFSACUAAAAAA3NjM0MDgzMjQyMjM0OTkyICAgICAgICAgICBCQVggVGVzdCAgICAgICAgICAgICAgLyAgICAgL1BhcmlzICAgICAgICAgICAgICAgICAvRlIgQDAwMTAwMjExMDAyMDMyRTU0MTIxQTBCQTVBQkM1NjVFOEYzRTYyNUU2Q0VGRTAwMDUwMTIxMUFBMjJCQjMzQ0MJeGmfAgYAAAAAIQCfAwYAAAAAAACfGgICUJUFAAAAAABfKgIJeJoDGAEJnAEAnzcEDwEOA4ICGoCfNgIAAZ8QIA+lAaCBAQAA8BCg+o6FJxMPAAAAAAAAAAAAAAAAAAAAnyYI+PQV6Iz2nvgIZxuvDPXbRg==
 ```
 
-#### Fields specification
+##### Fields specification
 
 | Field      | Value                                                                                                                                                                                                                                                                                                                                            | Description                        |
 |------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------|
@@ -989,12 +966,12 @@ EQByBGYACGGCAREGAyABBIYgGWEAAAAAAAAAIQAGBQYBQygJFSACUAAAAAA3NjM0MDgzMjQyMjM0OTky
 | Field-64   | 08671BAF0CF5DB46                                                                                                                                                                                                                                                                                                                                 | MESSAGE AUTHENTICATION CODE FIELD  |
 (*) Full field55: 9F02060000000021009F03060000000000009F1A020250950500000000005F2A0209789A031801099C01009F37040F010E0382021A809F360200019F10200FA501A081010000F010A0FA8E8527130F0000000000000000000000000000009F2608F8F415E88CF69EF8
 
-### Detokenization response:
+#### Detokenization response:
 
 The response is successful and contains the PAN in Field-2. The MAC is computed using
 a 2KEY 3DES MAC session key and SHA-256 hash for the message transformation
 
-#### HTTP dump
+##### HTTP dump
 
 ```
 HTTP/1.1 200 OK
@@ -1020,12 +997,12 @@ ERBABAAAAgEBAREFAAUAFWAAAFMnBAAALjAwMTAwMjExMDAyMDMyQ0NDQjk2MjE3ODQ4NTU5RkI1RjdF
 | Field-64   | 161402C4B99F5542                               | MESSAGE AUTHENTICATION CODE FIELD  |
 
 
-### Advice request:
+#### Advice request:
 
 The advice request is sent to notify the wallet about the detokenization result. Field 2 contains the PAN, field-39
 contains the result of the detokenization.
 
-#### HTTP dump
+##### HTTP dump
 
 ```
 POST /gtotx/api/iso/stoepay/v10/msg/stoepay HTTP/1.1
@@ -1040,7 +1017,7 @@ ESByBGYACmGAAREFAAUAFWAAAFMAAAAAAAAAAQAGBQhDJScEFSACUAAAAAE2MDg2NzE5ODA2NDIAADQ5
 
 ```
 
-#### Fields specification
+##### Fields specification
 
 | Field     | Value                                                                                                                                                                                                                                                                                                                                                  | Description                        |
 |-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------|
@@ -1063,11 +1040,11 @@ ESByBGYACmGAAREFAAUAFWAAAFMAAAAAAAAAAQAGBQhDJScEFSACUAAAAAE2MDg2NzE5ODA2NDIAADQ5
 | Field-49  | 978                                                                                                                                                                                                                                                                                                                                                    | CURRENCY CODE, TRANSACTION         |
 | Field-64  | 454D14F8695CE5D2                                                                                                                                                                                                                                                                                                                                       | MESSAGE AUTHENTICATION CODE FIELD  |
 
-### Advice response:
+#### Advice response:
 
 The advice response contains the token pan in field-2.
 
-#### HTTP dump
+##### HTTP dump
 
 ```
 HTTP/1.1 200 OK
@@ -1083,14 +1060,14 @@ ERBABAAAAgEBAREFAAUAFWAAAFMnBAAALjAwMTAwMjExMDAyMDMyQTA2QTUwNjFDQkI5RjE1RTE1Nzg4
 
 ```
 
-### 8.6.2 Detokenization using AES MAC
+#### 8.6.2 Detokenization using AES MAC
 
-### Detokenization Request:
+#### Detokenization Request:
 
-A detokenization request is sent by the remote host to the Cloud TSP to retrieve the PAN from a token. This example calculates the MAC using
+A detokenization request is sent by the remote host to the Stø Token Service to retrieve the PAN from a token. This example calculates the MAC using
 an AES TR-31 key block as a session key and SHA-256 hash for the message transformation. Field-55 is from a PURE wallet.
 
-#### HTTP dump
+##### HTTP dump
 
 ```
 POST /gtotx/api/iso/stoepay/v10/msg/stoepaycmac HTTP/1.1
@@ -1104,7 +1081,7 @@ Content-Length: 412
 EQByBGYACGGCARMHcREVcFFTQGhJAAAAAAAAACEACBgQBERJAhUgAlAAAAAAOTkwODYxOTc2NjEyNDk5MiAgICAgICAgICAgQkFYIFRlc3QgICAgICAgICAgICAgIC8gICAgIC9QYXJpcyAgICAgICAgICAgICAgICAgLyAgIK8wMDEwMDExMDAyMTQ0RDAxNDRNNkFDMDBFMDAwMDNFNDJFMDBDN0VCOTU2MzM2NEI5MjY1MDU0NEI2MUQ3NkVGMkRBODUzQkI5ODMwNjkwQzE1MjQ4NjlCRkM4MkVEQTE5NzlDRTk0NTk2Q0JFREExQzc2NjVBNTZFRTI2RjhERkZEMTYwREEyOTcwNURDMUQyQzgyNTBDNzc5NjAyMDA1MDEyMTFBQTIyQkIzM0NDCXhpnwIGAAAAACEAnwMGAAAAAAAAnxoCAlCVBQAAAAAAXyoCCXiaAxgBCZwBAJ83BA8BDgOCAhqAnzYCAAGfECAPpQGggQEAALg/fc3fC5zkDwAAAAAAAAAAAAAAAAAAAJ8mCN8LH2kefWIYdfUeZqmVVHKYHw5iVJ3CtA==
 ```
 
-#### Fields specification
+##### Fields specification
 
 | Field      | Value                                                                                                                                                                                                                                                                                                                                                            | Description                        |
 |------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------|
@@ -1129,12 +1106,12 @@ EQByBGYACGGCARMHcREVcFFTQGhJAAAAAAAAACEACBgQBERJAhUgAlAAAAAAOTkwODYxOTc2NjEyNDk5
 (*) Full field48: 0010011002144D0144M6AC00E00003E42E00C7EB9563364B92650544B61D76EF2DA853BB9830690C1524869BFC82EDA1979CE94596CBEDA1C7665A56EE26F8DFFD160DA29705DC1D2C8250C77960200501211AA22BB33CC <br>
 (**) Full field55: 9F02060000000021009F03060000000000009F1A020250950500000000005F2A0209789A031801099C01009F37040F010E0382021A809F360200019F10200FA501A081010000B83F7DCDDF0B9CE40F0000000000000000000000000000009F2608DF0B1F691E7D6218
 
-### Detokenization response:
+#### Detokenization response:
 
 The response is successful and contains the PAN in Field-2. The MAC is computed using
 an AES TR-31 block MAC session key and SHA-256 hash for the message transformation.
 
-#### HTTP dump
+##### HTTP dump
 
 ```
 HTTP/1.1 200 OK
@@ -1158,17 +1135,17 @@ ERBABAAAAgEBAREFAAUAFWAAAFMnBAAALjAwMTAwMjExMDAyMDMyQ0NDQjk2MjE3ODQ4NTU5RkI1RjdF
 | Field-64   | 010C91754A517D678A6AFDCA9C6707E4                                                                                                                               | MESSAGE AUTHENTICATION CODE FIELD  |
 
 
-## 8.7 Field 55 Example
+### 8.7 Field 55 Example
 
 Field 55 contains the data elements related to the Integrated Circuit Card (ICC). The contents of the fields is a series
 of tags created by the merchant POS typically. It is formatted as a BER-TLV structure, with various tags depending on
 the payment kernel used. The tags are defined in the EMV specifications Book 3.
 
-In the Cloud TSP ISO API, the main usage of field 55 is to verify the application cryptogram, to authenticate the
+In the Stø Token Service ISO API, the main usage of field 55 is to verify the application cryptogram, to authenticate the
 request. The ISO API will not reject requests with additional tags, but the minimum set of tags, depending on the
 payment kernel in use, must be present.
 
-### PURE
+#### PURE
 
 The following table provides the list of mandatory data elements that must be present in field 55 when present in the 1100 ISO message:
 

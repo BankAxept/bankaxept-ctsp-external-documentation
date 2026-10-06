@@ -15,7 +15,8 @@ nav:
       - Introduction: getting_started.md
       - Onboarding: onboarding.md
       - Resources:
-          - STØ Token Service ISO API v2.8 current: TSP_ISO_Message.md
+          - STØ Token Service ISO API v2.9 current: TSP_ISO_Message.md
+          - STØ Token Service ISO API v2.8: TSP_ISO_Message_V2.8.md
           - STØ Token Service ISO API v2.7: TSP_ISO_Message_V2.7.md
           - STØ Token Service ISO API v2.6: TSP_ISO_Message_V2.6.md
           - STØ Token Service ISO API v2.5: TSP_ISO_Message_V2.5.md

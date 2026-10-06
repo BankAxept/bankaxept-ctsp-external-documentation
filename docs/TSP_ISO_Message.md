@@ -922,12 +922,12 @@ The following algorithms are supported:
 
 ### 8.4.7 Key types and algorithms - AES
 
-|                          |                                                                                                                                     |
-|--------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
-| MAC KEK Key Type         | AES (128, 192 or 256 bits)                                                                                                          |
-| MAC session key Key Type | AES 128bits                                                                                                                         |
-| MAC Key wrapping         | AES in TR-31 key block                                                                                                              |
-| MAC                      | AES-CMAC Algorithm (RFC 4493), with padding as defined in the AES-CMAC specification The MAC is the 8 leftmost bytes of the output. |
+|                          |                                                                                                                                      |
+|--------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| MAC KEK Key Type         | AES (128, 192 or 256 bits)                                                                                                           |
+| MAC session key Key Type | AES 128bits                                                                                                                          |
+| MAC Key wrapping         | AES in TR-31 key block                                                                                                               |
+| MAC                      | AES-CMAC Algorithm (RFC 4493), with padding as defined in the AES-CMAC specification The MAC is the 16 leftmost bytes of the output. |
 
 
 ## 8.5 ISO interface

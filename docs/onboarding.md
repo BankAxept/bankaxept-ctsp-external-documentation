@@ -1,32 +1,42 @@
-# Onboarding
+# Connectivity overview and checklist
 
-This page describes all steps required to start utilizing STØ Token Service APIs. It includes a checklist of all necessary steps
-and requirements, as well as a description of why they are required.
+This chapter covers everything required to establish a working, trusted connection to STS, before any
+application messages are exchanged. It is the longest-lead part of an integration because several
+steps depend on work performed by Stø.
 
-There are two environments available: preproduction and production. The preproduction environment is used for testing
-and development purposes, while the production environment is used for live transactions. Our support team can provide
-more detailed log information and assistance in the preproduction environment. During the initial integration, one or more
-security features can be disabled to ease the integration process. This is done on a case-by-case basis and must be
-agreed upon with BankAxept.
+Perform the whole procedure once per [environment](environments.md). Preproduction first.
 
-Connectivity is completed, the APIs are ready to be used. If the ISO-API is used, a set of MAC keys needs to be
-exchanged between the integrator and BankAxept. The MAC keys are used to ensure message integrity and authenticity in
-the messages exchanged.
+## Checklist
 
-## Connectivity activities
+Steps 1–3 apply to both interfaces. Step 4 applies to the ISO 8583 interface only.
 
-For each of the supported environments (preproduction and production) the following activities must be completed:
+- [ ] **1. Submit source IP addresses** — see [below](#source-ip-addresses)
+- [ ] **2. Obtain a client certificate** — see [Mutual TLS](mtls_configuration.md)
+- [ ] **3. Run the connectivity test** — see [Connectivity test](connectivity_test.md)
+- [ ] **4. Complete key exchange** — see [Key exchange](zmk_exchange.md)
 
-1. Submit source IP address to BankAxept
-2. Create certificate signing request 
-3. Connectivity test
+Steps 1 and 2 can run in parallel; both must complete before step 3, since the firewall and the
+certificate are checked together. Step 4 is independent of steps 1–3 and should be started early in
+production, where courier delivery of key components sets the pace.
 
-### Source IP address
+## Source IP addresses
 
-The source IP address, or addresses, is used to allow the integrator's IP address in the BankAxept firewall. Any changes
-in the source IP needs to be communicated to BankAxept.
+Submit the source IP address, or addresses, from which your host will connect. Stø adds them to the
+firewall allow list for that environment. Traffic from any other address is rejected before it
+reaches the service.
 
-### Certificate signing request
+!!! warning "Notify Stø before changing source IPs"
 
-A certificate signing request (CSR) needs to be provided to the Cloud TSP support team. Once the CSR is received, the
-support team will generate a certificate. This will be used to enable secure connectivity to the APIs.
+    Any change to your source IP addresses must be communicated to Stø in advance. An unannounced
+    change will cause all traffic to be blocked.
+
+## What happens next
+
+Once connectivity is established the APIs are reachable, and — for the ISO 8583 interface — a set of
+keys is in place to protect message integrity and authenticity. From there, continue to the
+[Protocol](macusage.md) chapter.
+
+## Support
+
+Integration is a cooperative process that expects continuous communication between Stø and the
+integrator. Contact the Stø Token Service support team at any point in this procedure.

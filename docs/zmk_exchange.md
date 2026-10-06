@@ -1,44 +1,62 @@
-# Zone Master Key (ZMK) Exchange
+# Key exchange
 
-A Zone Master Key (ZMK) exchange is required to establish trust between the POS aggregator and the Stoe Token Service Provider (STS).
-After both parties have loaded the ZMK in to their respective hardware security modules (HSM).
+!!! info "ISO 8583 interface only"
 
-The ZMK will be delivered as key components, where each component is delivered separately to different key custodians.
-Each component is provided with a KVC and the KVC to the final key. The KVC algorithm is CMAC for AES keys, and ZL6
-(aka encrypt zero) for 3DES (not supported for ZMK in STS).
+    This step is required for the [ISO 8583 interface](choosing_an_interface.md), which protects
+    every message with a MAC. The JSON detokenization API does not use these keys.
 
-## Key Exchange and Delivery Procedure
+Before MAC-protected messages can be exchanged, a key hierarchy must be established between your HSM
+and Stø's.
 
-### ZMK Exchange Method
-For production environments, the Zone Master Key (ZMK) shall be exchanged via a courier service mutually agreed upon by the involved parties. If a single courier service is employed for the delivery of all key components, the second component shall be dispatched only upon confirmed receipt of the first component.
+## Key hierarchy
 
-### ZMK Generation and Format
-The ZMK shall be generated using the AES-256 encryption standard, unless alternative specifications are required due to customer or business constraints. The key will be delivered digitally in two separate components.
+| Key | Purpose | Exchanged how |
+|-----|---------|---------------|
+| **ZMK** (Zone Master Key) | Establishes trust between the two parties; protects the keys exchanged under it | Key ceremony — components delivered separately to key custodians |
+| **KI** (Key Interchange) | Encrypts the ephemeral MAC key carried in each message | Exchanged encrypted under the ZMK |
+| **MAC key** | Ephemeral; computes the MAC on an individual message | Generated per message, sent encrypted under KI in the message itself |
 
-### Key Length Limitation
-It is important to note that the ZMK can only be used to protect cryptographic keys that are of equal or shorter length than the ZMK itself.
+The ZMK is exchanged once, during onboarding. KI keys are exchanged under it and can be rotated
+afterwards without a new ceremony — each is identified by a key index from 1 to 255, allowing
+switchover. See [Message authentication](macusage.md) for how these keys are used per message.
 
-### Component Delivery Protocol
-Each key component shall be enclosed in tamper-evident envelopes and delivered to designated key custodians. Custodians are required to formally acknowledge receipt by signing the delivery documentation.
+!!! warning "Key length constraint"
 
-### Key Component Combination Method
-The two key components shall be combined using the bitwise XOR operation to reconstruct the complete ZMK.
+    A ZMK can only protect keys of equal or shorter length than itself. Size the ZMK for the longest
+    KI you intend to use.
 
-## Key Exchange and Delivery Procedure Preproduction
+## ZMK format
 
-For preproduction the exchange of ZMK can be done via secure email or other secure means agreed upon between the parties. The key ceremony can be done by either parties. Details about Stø procedure can be provided on request.
+The ZMK is generated using **AES-256** unless alternative specifications are required by customer or
+business constraints. It is delivered as **two components**, combined with a bitwise **XOR** to
+reconstruct the full key.
 
-### Delivery
+Each component is provided with its own **KVC** (Key Verification Check value), together with the KVC
+of the final combined key, so each custodian can confirm their component loaded correctly and both
+parties can confirm the reconstructed ZMK matches. The KVC algorithm is **CMAC** for AES keys, and
+**ZL6** ("encrypt zero") for 3DES — 3DES is not supported for ZMK in STS.
 
-For preproduction the ZMK can be delivered via secure email or other secure means agreed upon between the parties.
+## Production delivery
 
-The components are joined with XOR.
+For production, ZMK components are exchanged via a courier service mutually agreed by both parties.
 
-### Example of digital delivery for test / preproduction
+* Each component is enclosed in a **tamper-evident envelope** and delivered to a designated key
+  custodian. Custodians formally acknowledge receipt by signing the delivery documentation.
+* If a single courier service is used for all components, the second component is dispatched **only
+  after receipt of the first has been confirmed**.
 
-For preproduction both components can be delivered digitally. Below is an example of how the ZMK components will be delivered.
+Both parties load the ZMK into their respective HSMs. Courier delivery to separate custodians sets
+the pace of production onboarding — start this early.
 
-### Example with two components in one file.
+## Preproduction delivery
+
+For preproduction the ZMK may be exchanged by secure email or other secure means agreed between the
+parties. The key ceremony can be performed by either party; details of the Stø procedure are
+available on request. Components are combined with XOR as in production.
+
+### Example of digital delivery
+
+Both components may be delivered in a single file:
 
 ```
 #############################################
@@ -56,34 +74,44 @@ KVC            : 32F9A0
 KVC of KEY     : 094D1D
 ```
 
-### Example with components in different files.
+Or in separate files, one per component:
 
-File 1:
-```
-#############################################
-# STØ Token service - Key Components Form   #
-# Environment: Test / Preprod               #
-# Date       : 2025-10-31                   #
-#############################################
+=== "File 1"
 
-Key Component 1: 0143 2B73 C73E 97D2 09A4 4560 5440 561C 3D81 1563 F540 0A62 9AB3 95F7 27E9 6D8F
-KVC            : D2E93B
+    ```
+    #############################################
+    # STØ Token service - Key Components Form   #
+    # Environment: Test / Preprod               #
+    # Date       : 2025-10-31                   #
+    #############################################
 
-KVC of KEY     : 094D1D
-```
+    Key Component 1: 0143 2B73 C73E 97D2 09A4 4560 5440 561C 3D81 1563 F540 0A62 9AB3 95F7 27E9 6D8F
+    KVC            : D2E93B
 
-File 2:
-```
-#############################################
-# STØ Token service - Key Components Form   #
-# Environment: Test / Preprod               #
-# Date       : 2025-10-31                   #
-#############################################
+    KVC of KEY     : 094D1D
+    ```
 
-Key Component 2: 67D2 2AB3 2ECD 6D3B A4C1 239D 59C6 35EA 5C11 3B7C BBB8 74D6 62A5 1C8F BD0A 7D73
-KVC            : 32F9A0
+=== "File 2"
 
-KVC of KEY     : 094D1D
-```
+    ```
+    #############################################
+    # STØ Token service - Key Components Form   #
+    # Environment: Test / Preprod               #
+    # Date       : 2025-10-31                   #
+    #############################################
 
-Note that the KVC of key refers to the complete ZMK.
+    Key Component 2: 67D2 2AB3 2ECD 6D3B A4C1 239D 59C6 35EA 5C11 3B7C BBB8 74D6 62A5 1C8F BD0A 7D73
+    KVC            : 32F9A0
+
+    KVC of KEY     : 094D1D
+    ```
+
+In both cases `KVC of KEY` refers to the complete reconstructed ZMK, not to either component.
+
+!!! note "Example values"
+
+    The key components above are illustrative and are not valid key material.
+
+## Next steps
+
+With the key hierarchy in place, continue to [Message authentication](macusage.md).

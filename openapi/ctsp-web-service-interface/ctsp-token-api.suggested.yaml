@@ -1,0 +1,778 @@
+openapi: 3.0.3
+info:
+  title: STØ Token Service — Detokenization API (JSON)
+  version: "1.1-DRAFT_2026-07-15"
+  contact:
+    name: STØ Token Service integration support
+    url: https://stoe.no/en/services/token-service
+  description: >
+    # Introduction
+
+
+    The **Detokenization API** is the JSON/HTTPS interface used during payment processing to exchange a
+    **payment token** for the underlying card number (PAN) and to report the final result of a transaction.
+    It is a modern, JSON-based alternative to the ISO 8583 interface described in *ISO 8583 Interface with
+    Cloud TSP*; both interfaces expose the same underlying behaviour, so the ISO 8583 document remains the
+    authoritative reference for detailed processing rules.
+
+
+    Typical caller: a **payment processor / POS aggregator** that receives token-based transactions from
+    terminals, e-commerce or wallets and needs the real PAN to route the authorisation to the issuer.
+
+
+    The API offers two operations plus a connectivity check:
+
+    * **`POST /detokenize`** — validate a token transaction and, if approved, return the encrypted card
+      details (PAN + expiry). Used before sending the authorisation to the issuer.
+
+    * **`POST /notify`** — report the outcome of a transaction back to the Token Service and trigger a
+      notification to the cardholder's wallet (e.g. purchase approved/declined).
+
+    * **`GET /healthcheck`** — lightweight readiness probe for connectivity testing and monitoring.
+
+
+    # How a transaction flows
+
+
+    1. A cardholder pays with a token (device token in a wallet, or a card-on-file token).
+
+    2. The processor calls **`/detokenize`**. The Token Service verifies the token, applies the token's
+       domain-restriction controls, validates the payment cryptogram (for chip/contactless and in-app
+       transactions), and returns the **PAN + expiry** (encrypted) so the processor can authorise with the
+       issuer.
+
+    3. After the issuer responds, the processor calls **`/notify`** with the final `actionCode` so the Token
+       Service can notify the cardholder's wallet and keep its transaction history in sync.
+
+
+    # Standalone vs. historical transactions
+
+
+    The value of `transactionType` determines how a request is processed:
+
+    * **Standalone / financial (`00`, `09`)** — a new purchase. The Token Service performs a full
+      detokenization, including cryptogram validation, and therefore **requires `chipRelatedData`** for
+      chip, contactless and in-app transactions.
+
+    * **Historical / advice (`20`, `22`, `52`, `92`)** — refunds, reversals, returns and pre-authorisation
+      confirmations that refer back to an earlier transaction. These are resolved by looking up the original
+      transaction via `reference`, so `chipRelatedData` is **not required**. For these cases `/notify` alone
+      is often sufficient when the PAN is not needed.
+
+
+    # Multi-tenancy & routing
+
+
+    STØ Token Service is multi-tenant. **You are identified by your mutual-TLS client certificate**, which the
+    Token Service maps to your integration profile — the token portfolios you may detokenize, your processing
+    configuration and your keys. You do **not** send a tenant identifier in the body. The `scheme` field is
+    descriptive metadata (the payment programme the transaction belongs to), not a routing key.
+
+
+    # HTTP status codes vs. business result
+
+
+    Distinguish transport errors from business outcomes:
+
+    * **`200 OK`** — the request was processed. **You must inspect `responseCode`**: `000` means approved;
+      any other value is a business decline (e.g. expired card, failed cryptogram). A decline is still an
+      HTTP `200`.
+
+    * **`400 Bad Request`** — the request was malformed or failed validation; fix it before retrying. Body is
+      an `ErrorResponse`.
+
+    * **`500 Internal Server Error`** — a transient server-side problem; the request may be safely retried.
+
+
+    # Security
+
+
+    The API is protected at two layers:
+
+    * **Transport:** mutual TLS (mTLS). Your client certificate both encrypts the channel and authenticates
+      your tenant.
+
+    * **Application:** the returned card data is additionally encrypted using **JSON Web Encryption (JWE)**
+      (RFC 7516, Compact Serialization). Only you can decrypt it with your data-encryption private key.
+
+
+    ## Certificates you provide
+
+    Two certificates are provisioned during onboarding, each from a CSR you generate with a 2048-bit or
+    4096-bit RSA key:
+
+    1. a **client (mTLS) certificate** — identifies your tenant and secures the channel;
+
+    2. a **data-encryption certificate** — used by the Token Service to JWE-encrypt the card data returned to
+       you.
+
+
+    # Correlation
+
+
+    Send a unique **`x-request-id`** on every call. It is logged and propagated across systems to trace a
+    single request end-to-end, and is invaluable when raising support cases.
+
+
+    # References
+
+
+    * *ISO 8583 Interface with Cloud TSP* — the authoritative behavioural specification. This JSON API is an
+      alternate interface to it.
+
+    * Onboarding, connectivity test and mTLS configuration guides in the STØ Token Service documentation.
+
+tags:
+  - name: payment
+    description: Detokenization and transaction-result notification.
+  - name: healthcheck
+    description: Connectivity and readiness checks.
+
+servers:
+  - url: https://ctsp-proc-pp.baxlab.no/gtotx/api/v1.0/proc
+    description: Preproduction — for integration, testing and QA.
+  - url: https://tx.ctsp.stoe.no/gtotx/api/v1.0/proc
+    description: Production — live transactions.
+
+paths:
+  /detokenize:
+    post:
+      summary: Detokenize a token transaction and return the encrypted card details.
+      description: >
+        Validates a token-based transaction and, when approved, returns a `cipheredDetokenizedCard`
+        containing the underlying PAN and expiry (JWE-encrypted).
+
+
+        The Token Service verifies token state and expiry, applies the token's domain-restriction controls,
+        and — for chip, contactless and in-app transactions — validates the payment cryptogram carried in
+        `chipRelatedData`. For **purchase** transactions (`transactionType` `00` or `09`), `chipRelatedData`
+        is **required**.
+
+
+        This endpoint is intended for payment detokenization only; the returned PAN must be used solely to
+        complete the current authorisation.
+      tags:
+        - payment
+      operationId: detokenize
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+      requestBody:
+        description: The token transaction to validate and detokenize.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DetokenizationRequest'
+            examples:
+              contactlessPurchase:
+                summary: Contactless purchase (with cryptogram)
+                value:
+                  scheme: EXAMPLEPAY
+                  reference: f89c37ef-f7bd-4220-928f-3f4287e261a4
+                  tokenizedCard:
+                    pan: "90615205001511804"
+                    expiry: "2410"
+                    panSequenceNumber: "0"
+                  amount:
+                    value: "229900"
+                    currency: EUR
+                  transactionDateTime: 2026-07-15T10:00:10.500Z
+                  transactionType: "00"
+                  panEntryMode: "07"
+                  merchantCategoryCode: "5812"
+                  cardAcceptor:
+                    identificationCode: "MERCHANT0000123"
+                    name: Restaurant Maaemo
+                    zip: "0290"
+                    city: Oslo
+                    region: OSL
+                    countryCode: NO
+                  chipRelatedData:
+                    amountAuthorized: "000000229900"
+                    amountOther: "000000000000"
+                    terminalCountryCode: "578"
+                    terminalVerificationResult: "0000000000"
+                    transactionCurrencyCode: "978"
+                    transactionDate: "260715"
+                    transactionType: "00"
+                    unpredictableNumber: "BEEFCAFE"
+                    applicationInterchangeProfile: "5800"
+                    applicationTransactionCounter: "00A0"
+                    issuerApplicationData: "07010104A4000100"
+                    applicationCryptogram: "A1A717065FF030A3"
+                    cryptogramInformationData: "80"
+      responses:
+        '200':
+          description: >
+            The request was processed. **Inspect `responseCode`**: `000` = approved (card details present in
+            `cipheredDetokenizedCard`); any other value is a business decline and no card details are returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetokenizationResponse'
+              examples:
+                approved:
+                  summary: Approved — encrypted card returned
+                  value:
+                    responseCode: "000"
+                    responseMessage: Approved
+                    cipheredDetokenizedCard: eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ...
+                declined:
+                  summary: Declined — expired card, no card returned
+                  value:
+                    responseCode: "001"
+                    responseMessage: Expired card
+        '400':
+          description: The request is malformed or failed validation. Fix it before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Transient server-side error. The request may be retried.
+      x-codegen-request-body-name: body
+
+  /notify:
+    post:
+      summary: Report a transaction result and trigger a wallet notification.
+      description: >
+        Reports the outcome of a payment transaction to the Token Service and triggers a notification towards
+        the cardholder's wallet. Correlate the notification with the earlier `/detokenize` call by reusing the
+        same `reference`.
+
+
+        Unlike the ISO 8583 interface, only `actionCode` values from the closed `ResponseActionCode` list are
+        accepted.
+      tags:
+        - payment
+      operationId: notify
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationRequest'
+            examples:
+              purchaseApproved:
+                summary: Purchase approved
+                value:
+                  scheme: EXAMPLEPAY
+                  reference: f89c37ef-f7bd-4220-928f-3f4287e261a4
+                  amount:
+                    value: "229900"
+                    currency: EUR
+                  transactionType: "00"
+                  actionCode: "000"
+      responses:
+        '204':
+          description: The result was accepted and processed. No response body.
+        '400':
+          description: The request is malformed or failed validation. Fix it before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Transient server-side error. The request may be retried.
+      x-codegen-request-body-name: body
+
+  /healthcheck:
+    get:
+      summary: Readiness / connectivity check.
+      description: >
+        Lightweight readiness probe. Returns `204 No Content` when the service is up. Intended for
+        connectivity testing and monitoring; do not call more often than needed (e.g. at most once per
+        minute).
+      tags:
+        - healthcheck
+      operationId: healthcheck
+      responses:
+        '204':
+          description: Service is up and ready.
+
+components:
+  parameters:
+    XRequestId:
+      name: x-request-id
+      in: header
+      required: true
+      description: >
+        Unique identifier for this request, echoed in logs and propagated across systems for end-to-end
+        tracing. Use a UUID.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 36
+        example: d069b004-5714-4823-9457-98c32c6e785f
+
+  schemas:
+    DetokenizationRequest:
+      type: object
+      description: A token-based transaction to validate and detokenize.
+      required:
+        - scheme
+        - tokenizedCard
+        - reference
+        - amount
+        - transactionDateTime
+        - transactionType
+        - panEntryMode
+      properties:
+        scheme:
+          $ref: '#/components/schemas/Scheme'
+        tokenizedCard:
+          $ref: '#/components/schemas/TokenizedCard'
+        reference:
+          $ref: '#/components/schemas/Reference'
+        merchantCategoryCode:
+          description: >
+            Merchant Category Code (MCC) classifying the merchant's line of business, per ISO 18245.
+            Conditional — inclusion depends on your scheme's business requirements.
+          type: string
+          pattern: '^\d{4}$'
+          example: "5812"
+        amount:
+          $ref: '#/components/schemas/Amount'
+        transactionDateTime:
+          description: >
+            Transaction timestamp in ISO 8601 / RFC 3339, expressed in UTC. Milliseconds are ignored during
+            processing.
+          type: string
+          format: date-time
+          example: 2026-07-15T10:00:10.500Z
+        transactionType:
+          $ref: '#/components/schemas/TransactionType'
+        panEntryMode:
+          $ref: '#/components/schemas/PanEntryMode'
+        cardAcceptor:
+          $ref: '#/components/schemas/CardAcceptor'
+        chipRelatedData:
+          description: >
+            EMV chip data used to validate the payment cryptogram.
+
+            **Conditionally required:** it MUST be present for purchase transactions
+            (`transactionType` `00` and `09`). It is not required for historical transactions
+            (`20`, `22`, `52`, `92`), which are resolved by `reference`.
+          allOf:
+            - $ref: '#/components/schemas/ChipRelatedData'
+
+    DetokenizationResponse:
+      type: object
+      required:
+        - responseCode
+        - responseMessage
+      properties:
+        responseCode:
+          $ref: '#/components/schemas/ResponseActionCode'
+        responseMessage:
+          description: Human-readable message corresponding to `responseCode`. For display/logging only; do not branch logic on this text.
+          type: string
+        cipheredDetokenizedCard:
+          $ref: '#/components/schemas/CipheredDetokenizedCard'
+
+    NotificationRequest:
+      type: object
+      description: The final result of a transaction, used to notify the cardholder's wallet.
+      required:
+        - scheme
+        - reference
+        - amount
+        - transactionType
+        - actionCode
+      properties:
+        scheme:
+          $ref: '#/components/schemas/Scheme'
+        reference:
+          $ref: '#/components/schemas/Reference'
+        amount:
+          $ref: '#/components/schemas/Amount'
+        transactionType:
+          $ref: '#/components/schemas/TransactionType'
+        actionCode:
+          allOf:
+            - $ref: '#/components/schemas/ResponseActionCode'
+          description: The final outcome of the transaction (e.g. `000` approved, or a decline code).
+
+    CipheredDetokenizedCard:
+      type: string
+      minLength: 1
+      maxLength: 8196
+      description: >
+        The card details (see `DetokenizedCard`) as a JSON object, encrypted with **JSON Web Encryption**
+        (RFC 7516, Compact Serialization) using your data-encryption certificate. Present only when
+        `responseCode` is `000`.
+
+        * Content encryption algorithm: **A256GCM**.
+
+        * Key encryption algorithm: **RSA-OAEP**.
+
+        Decrypt with your data-encryption private key to obtain a `DetokenizedCard` JSON document.
+      example: eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ.<encrypted-key>.<iv>.<ciphertext>.<tag>
+
+    DetokenizedCard:
+      type: object
+      description: The decrypted contents of `cipheredDetokenizedCard`.
+      required:
+        - pan
+        - expiry
+      properties:
+        pan:
+          description: The underlying Primary Account Number (PAN) of the card. Handle as sensitive cardholder data (PCI DSS).
+          type: string
+          pattern: '^\d{1,19}$'
+          example: "4571990000001234"
+        expiry:
+          $ref: '#/components/schemas/Expiry'
+
+    TokenizedCard:
+      type: object
+      description: The token presented for payment.
+      required:
+        - pan
+        - expiry
+        - panSequenceNumber
+      properties:
+        pan:
+          $ref: '#/components/schemas/Token'
+        expiry:
+          $ref: '#/components/schemas/Expiry'
+        panSequenceNumber:
+          $ref: '#/components/schemas/PanSequenceNumber'
+
+    Expiry:
+      description: Expiry date as `yymm`.
+      type: string
+      pattern: '^\d{2}(0[1-9]|1[0-2])$'
+      example: "2410"
+
+    Amount:
+      description: A monetary amount with its currency.
+      type: object
+      required:
+        - value
+        - currency
+      properties:
+        value:
+          description: Amount in the currency's minor units (e.g. cents), as a numeric string. Example `229900` = 2 299.00.
+          type: string
+          pattern: '^\d{1,12}$'
+          example: "229900"
+        currency:
+          description: Currency as a three-letter alphabetic code per ISO 4217.
+          type: string
+          pattern: '^[A-Z]{3}$'
+          example: "EUR"
+
+    TransactionType:
+      type: string
+      description: >
+        The transaction / processing type.
+
+        **Standalone (financial)** — a new transaction requiring full detokenization (and `chipRelatedData`
+        for chip/contactless/in-app):
+
+        * `00` — Purchase & Services
+        * `09` — Purchase with cashback
+
+        **Historical (advice)** — refers back to an earlier transaction via `reference`; `chipRelatedData`
+        not required:
+
+        * `20` — Refund
+        * `22` — Credit reversal
+        * `52` — Credit — return of goods
+        * `92` — Confirmation of a pre-authorization
+      enum: ["00", "09", "20", "22", "52", "92"]
+      example: "00"
+
+    PanEntryMode:
+      type: string
+      description: >
+        How the token/PAN was captured (POS entry mode).
+
+        * `00` — Unknown / not specified. (When a purchase carries EMV-style QR data, the service may derive
+          the effective entry mode internally.)
+        * `01` — Manual entry
+        * `02` — Magnetic stripe
+        * `03` — Magnetic stripe (fallback after a chip-read issue)
+        * `04` — QR code
+        * `05` — Contact chip
+        * `06` — E-commerce, with optional AAV
+        * `07` — Contactless chip
+        * `08` — E-commerce, with cryptogram in `chipRelatedData`
+      enum: ["00", "01", "02", "03", "04", "05", "06", "07", "08"]
+      example: "07"
+
+    CardAcceptor:
+      type: object
+      description: Identifies the merchant / point of acceptance. Optional; when present, `identificationCode` and `name` are required.
+      required:
+        - identificationCode
+        - name
+      properties:
+        identificationCode:
+          description: Merchant identifier that uniquely identifies the point of acceptance in local and interchange environments.
+          type: string
+          minLength: 15
+          maxLength: 15
+          example: "MERCHANT0000123"
+        name:
+          description: Merchant (card acceptor) name.
+          type: string
+          maxLength: 22
+          example: "Restaurant Maaemo"
+        zip:
+          description: Postal / ZIP code.
+          type: string
+          maxLength: 5
+          example: "0290"
+        city:
+          description: City.
+          type: string
+          maxLength: 128
+          example: "Oslo"
+        region:
+          description: State / province / region.
+          type: string
+          maxLength: 128
+          example: "OSL"
+        countryCode:
+          description: Country as a two-letter code per ISO 3166 Alpha-2.
+          type: string
+          maxLength: 2
+          example: "NO"
+
+    Token:
+      description: The payment token (a surrogate for the PAN). Numeric, up to 19 digits.
+      type: string
+      pattern: '^\d{1,19}$'
+      example: "90615205001511804"
+
+    Reference:
+      description: >
+        Your unique reference for the transaction, used for correlation and for looking up the original
+        transaction on historical operations and on `/notify`. Reuse the same value on the `/detokenize` and
+        `/notify` calls that belong to one transaction.
+
+        If migrating from the ISO 8583 interface, a common choice is the concatenation of ISO fields 37 and 7;
+        otherwise a UUID is recommended.
+      type: string
+      minLength: 12
+      maxLength: 36
+      example: f89c37ef-f7bd-4220-928f-3f4287e261a4
+
+    Scheme:
+      description: >
+        The payment scheme / programme the transaction belongs to (open or closed loop), as assigned to you
+        during onboarding. Descriptive metadata only — your tenant and permissions are determined by your
+        mutual-TLS client certificate, not by this field.
+      type: string
+      example: "EXAMPLEPAY"
+
+    ChipRelatedData:
+      type: object
+      description: >
+        EMV chip data (hex-encoded EMV tag values) used to validate the payment cryptogram. Required for
+        purchase transactions (`transactionType` `00`/`09`); see `DetokenizationRequest.chipRelatedData`.
+      required:
+        - amountAuthorized
+        - amountOther
+        - terminalCountryCode
+        - terminalVerificationResult
+        - transactionCurrencyCode
+        - transactionDate
+        - transactionType
+        - unpredictableNumber
+        - applicationInterchangeProfile
+        - applicationTransactionCounter
+        - issuerApplicationData
+        - applicationCryptogram
+        - cryptogramInformationData
+      properties:
+        amountAuthorized:
+          description: EMV tag 9F02 — authorised amount (excluding adjustments).
+          type: string
+          pattern: '^\d{12}$'
+          example: '000000229900'
+        amountOther:
+          description: EMV tag 9F03 — secondary amount (e.g. cashback).
+          type: string
+          pattern: '^\d{12}$'
+          example: '000000000000'
+        terminalCountryCode:
+          description: EMV tag 9F1A — terminal country, numeric per ISO 3166.
+          type: string
+          pattern: '^\d{3}$'
+          example: "578"
+        terminalVerificationResult:
+          description: EMV tag 95 — Terminal Verification Results (TVR), 5 bytes as 10 hex chars.
+          type: string
+          minLength: 10
+          maxLength: 10
+          example: "0000000000"
+        transactionCurrencyCode:
+          description: EMV tag 5F2A — transaction currency, numeric per ISO 4217.
+          type: string
+          minLength: 3
+          maxLength: 3
+          example: "978"
+        transactionDate:
+          description: EMV tag 9A — local transaction date, `YYMMDD`.
+          type: string
+          minLength: 6
+          maxLength: 6
+          example: "260715"
+        transactionType:
+          description: EMV tag 9C — transaction type (processing code).
+          type: string
+          pattern: '^\d{2}$'
+          example: "00"
+        unpredictableNumber:
+          description: EMV tag 9F37 — unpredictable number generated by the terminal, hex-encoded.
+          type: string
+          minLength: 8
+          maxLength: 8
+          example: "BEEFCAFE"
+        applicationInterchangeProfile:
+          description: EMV tag 82 — Application Interchange Profile (AIP).
+          type: string
+          minLength: 4
+          maxLength: 4
+          example: "5800"
+        applicationTransactionCounter:
+          description: EMV tag 9F36 — Application Transaction Counter (ATC), hex-encoded.
+          type: string
+          minLength: 4
+          maxLength: 4
+          example: "00A0"
+        issuerApplicationData:
+          description: EMV tag 9F10 — Issuer Application Data (IAD).
+          type: string
+          minLength: 0
+          maxLength: 64
+          example: "07010104A4000100"
+        applicationCryptogram:
+          description: EMV tag 9F26 — Application Cryptogram (ARQC), hex-encoded.
+          type: string
+          minLength: 16
+          maxLength: 16
+          example: "A1A717065FF030A3"
+        cryptogramInformationData:
+          description: EMV tag 9F27 — Cryptogram Information Data. Accepted values are `80` (ARQC) or `00` (AAC).
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: "80"
+        issuerAuthenticationData:
+          description: EMV tag 91 — Issuer Authentication Data (optional).
+          type: string
+          minLength: 16
+          maxLength: 32
+          example: "91102263BCC1C2D9C4420013"
+
+    PanSequenceNumber:
+      description: EMV tag 5F34 — distinguishes cards sharing the same PAN. Defaults to `0` when not supplied.
+      type: string
+      pattern: '^\d{1,3}$'
+      example: "0"
+
+    ResponseActionCode:
+      type: string
+      description: >
+        The result of the detokenization or the final outcome of the transaction. Values follow the
+        *ISO 8583 Interface with Cloud TSP* specification. Not every code applies to every transaction type.
+
+
+        **Approval**
+
+        * `000` — Transaction or request approved
+
+
+        **Card / account status**
+
+        * `001` — Expired card
+        * `003` — Unknown card or wrong card status
+        * `011` — Lost card
+        * `012` — Stolen card
+        * `013` — Suspected fraud
+
+
+        **Merchant / terminal / amount**
+
+        * `002` — Bad merchant
+        * `004` — Terminal transaction not permitted
+        * `007` — Invalid amount
+        * `008` — Insufficient funds / over credit limit (token domain control)
+        * `017` — Amount not within allowable limits derived from the amount in `chipRelatedData`
+        * `018` — Currency does not match the currency in `chipRelatedData`
+
+
+        **Message / processing**
+
+        * `006` — Message format error
+        * `009` — Duplicate transmission detected
+        * `010` — System error
+
+
+        **Cryptography / chip**
+
+        * `005` — Cryptographic check failure (wrong ARQC cryptogram)
+        * `014` — Cryptographic key not supported
+        * `015` — Wrong format in `chipRelatedData`
+        * `016` — Cryptogram expired (QR-code scenarios)
+        * `019` — Local Verification Results check failed (Apple Pay)
+        * `020` — Required CDCVM stamp is missing
+        * `021` — CDCVM stamp check failure
+        * `030` — ATC check failure
+
+
+        **Reserved for future use**
+
+        * `024` — RFU (required Cloud PIN stamp is missing)
+        * `025` — RFU (Cloud PIN stamp check failure)
+        * `029` — Cloud PIN not supported (Cloud PIN was used but is not supported)
+      enum:
+        - '000'
+        - '001'
+        - '002'
+        - '003'
+        - '004'
+        - '005'
+        - '006'
+        - '007'
+        - '008'
+        - '009'
+        - '010'
+        - '011'
+        - '012'
+        - '013'
+        - '014'
+        - '015'
+        - '016'
+        - '017'
+        - '018'
+        - '019'
+        - '020'
+        - '021'
+        - '024'
+        - '025'
+        - '029'
+        - '030'
+      example: "000"
+
+    ErrorResponse:
+      type: object
+      description: Returned with HTTP 400 when a request is malformed or fails validation.
+      required:
+        - errorCode
+        - errorMessage
+      properties:
+        errorCode:
+          description: A machine-readable code describing the type of error.
+          type: string
+          example: "invalid-field"
+        errorMessage:
+          description: A human-readable description of the error.
+          type: string
+          example: "Invalid field 'amount'"

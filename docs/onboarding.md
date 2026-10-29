@@ -1,7 +1,7 @@
 # Connectivity overview and checklist
 
 This chapter covers everything required to establish a working, trusted connection to STS, before any
-application messages are exchanged. It is the longest-lead part of an integration because several
+application messages are exchanged. It is foundational part of an integration and several
 steps depend on work performed by Stø.
 
 Perform the whole procedure once per [environment](environments.md). Preproduction first.

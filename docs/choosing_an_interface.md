@@ -15,7 +15,7 @@ required.
 | **Certificates required** | Client certificate | Client certificate **and** a separate data encryption certificate |
 | **HSM required** | Yes | No |
 | **Key ceremony required** | Yes — ZMK and Key Interchange exchange | No |
-| **Documented in** | [ISO 8583 message reference](TSP_ISO_Message_V2.9.md) | [API reference](api_reference.md) |
+| **Documented in** | [ISO 8583 message reference](TSP_ISO_Message.md) | [API reference](api_reference.md) |
 
 ## ISO 8583 interface
 
@@ -24,21 +24,20 @@ ISO 8583 payment traffic and operate an HSM.
 
 Message integrity and authenticity are protected by a MAC on every message in both directions, using
 an ephemeral MAC key wrapped under a Key Interchange key. This requires HSM key management on your
-side and a key ceremony with Stø during onboarding, which is the longest-lead item in the
-[connectivity](onboarding.md) process.
+side and a key ceremony with Stø during onboarding.
 
-The ISO 8583 specification is the authoritative description of service behaviour for both interfaces.
+This specification is the authoritative description of service behaviour for both interfaces.
 
 ## JSON detokenization API
 
-An alternate interface for hosts that do not process ISO 8583. Instead of a MAC, sensitive card data
-is protected at application level: the PAN is encrypted using JSON Web Encryption
+An alternate interface for hosts that do not process ISO 8583. The major difference besides the message format
+is that it does not use MAC. Further the PAN is encrypted using JSON Web Encryption
 ([RFC 7516](https://datatracker.ietf.org/doc/html/rfc7516)) with Compact Serialization. This removes
 the HSM and key ceremony requirements, but adds a second certificate — you generate a CSR with a
 2048-bit or 4096-bit key for data encryption alongside the mutual TLS client certificate.
 
 Behavioural detail for the operations is not repeated in the OpenAPI specification; the
-[ISO 8583 message reference](TSP_ISO_Message_V2.9.md) describes the behaviour of the equivalent
+[ISO 8583 message reference](TSP_ISO_Message.md) describes the behaviour of the equivalent
 operations in more depth.
 
 See the [API reference](api_reference.md) for the rendered OpenAPI specification.
@@ -52,6 +51,6 @@ See the [API reference](api_reference.md) for the rendered OpenAPI specification
 ## Which to choose
 
 Use the ISO 8583 interface if you already handle ISO 8583 traffic, operate an HSM, or need the full
-set of message-level data elements. Use the JSON API if you need detokenization only and prefer to
+set of message-level data elements. Use the JSON API if you need detokenization only or prefer to
 avoid HSM-based key management. If you are unsure, discuss it with the support team during
 onboarding — the connectivity steps differ enough that changing course later means repeating work.

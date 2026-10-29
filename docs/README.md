@@ -4,9 +4,9 @@
 
 # STØ Token Service
 
-STØ Token Service (STS) is a SaaS Token Service Provider (TSP) providing EMV and PCI payment
-tokenization. It performs tokenization, detokenization, token life cycle management (LCM), and
-notification.
+STØ Token Service (STS) is a SaaS Token Service Provider (TSP) providing EMV compatible and PCI DSS compliant payment
+tokenization. It performs tokenization (enrollment), life cycle management (LCM), detokenization, and
+token transaction notification.
 
 STS exposes two interfaces to the same underlying service and the same input data: an ISO 8583
 interface, and a JSON API. This site describes the connectivity, message exchange and cryptography
@@ -28,7 +28,7 @@ The documentation follows the order in which you will need it:
 |---------|--------|--------------|
 | [Overview](getting_started.md) | What STS does, which interface to use, environments and endpoints | Before you plan the work |
 | [Connectivity](onboarding.md) | IP allow-listing, mutual TLS, certificates, key exchange | Setting up the network and cryptographic trust |
-| [ISO 8583 API](TSP_ISO_Message_V2.9.md) | Message authentication (MAC), message types, data elements, field-by-field detail | If you integrate over ISO 8583 |
+| [ISO 8583 API](TSP_ISO_Message.md) | Message authentication (MAC), message types, data elements, field-by-field detail | If you integrate over ISO 8583 |
 | [JSON API](api_reference.md) | OpenAPI reference for the JSON detokenization interface | If you integrate over JSON |
 | [Reference](api_policy.md) | API design guidelines and versioning policy | Ongoing |
 

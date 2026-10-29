@@ -13,8 +13,10 @@ role STS performs.
 Because the token is only valid within its domain, a token captured outside that domain is not
 usable. This is what allows systems handling tokens to avoid storing PANs.
 
-STS supports both **EMV tokenization** — tokens provisioned to wallets and devices, carrying
-chip-level transaction data — and **PCI tokenization**.
+STS supports EMV payment tokenization, both for tokens provisioned to wallets and devices 
+(carrying chip-level transaction data) and for token-on-file, 
+where merchants and payment service providers store a token in place of the card number. 
+The tokens can also serve as PAN surrogates for storage, reducing PCI DSS scope.”
 
 ## Detokenization and re-tokenization
 
@@ -33,7 +35,7 @@ Response in the *EMV Payment Tokenisation Specification Technical Framework v2.0
 
 ## Token domain restriction controls
 
-When STS receives a detokenization request it does not simply look the token up. It applies **token
+When STS receives a detokenization request it applies **token
 domain restriction controls** appropriate to the token type, verifying that the token is being used
 in the domain it was issued for, before returning the PAN.
 
@@ -47,21 +49,13 @@ stored:
 * **In-app payment cloud cryptogram** — in-app transactions using a cloud-generated cryptogram.
 
 Each has its own verification flow with different requirements on the chip data you supply. These are
-specified in section 6 of the [ISO 8583 message reference](TSP_ISO_Message_V2.9.md).
-
-## Token assurance
-
-**Token assurance method** records how the cardholder was identified and verified when the token was
-provisioned — ranging from no verification performed, through issuer account verification, to
-interactive two-factor cardholder authentication. The codes are defined by EMVCo and listed in the
-appendix of the [message reference](TSP_ISO_Message_V2.9.md).
+specified in section 6 of the [ISO 8583 message reference](TSP_ISO_Message.md).
 
 ## Life cycle management and notification
 
-Tokens outlive individual transactions. **Life cycle management (LCM)** covers the token's states,
-including the re-linking that keeps a token valid when the underlying physical card is renewed or
-reissued, so the cardholder does not have to re-enrol. **Notification** is how STS informs the wallet
-of events affecting a token.
+Tokens can outlive the Funding PAN (card or funding source it is a surrogate for). **Life cycle management (LCM)** covers the token's states,
+including the re-linking that keeps a token valid when the underlying PAN (physical card or other funding source) is renewed or
+reissued, so the end-user (cardholder in most cases) does not have to re-enrol.
 
 ## Key terms
 

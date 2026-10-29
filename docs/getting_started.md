@@ -1,6 +1,6 @@
 # Integration overview
 
-This page describes the shape of an STS integration end to end, so you can scope the work before
+This page describes a typical STS integration project end to end, so you can scope the work before
 starting it. Each phase links to the chapter that covers it in detail.
 
 Every integration differs in detail, but all follow the same sequence. Phases 1 and 2 involve work on
@@ -39,7 +39,7 @@ both directions is protected by a [Message Authentication Code](macusage.md); a
 ## Phase 4 — Implement message handling
 
 Message types, data elements and validation rules are in the
-[ISO 8583 message reference](TSP_ISO_Message_V2.9.md). Implement against the current version and
+[ISO 8583 message reference](TSP_ISO_Message.md). Implement against the current version and
 track changes through the [API design guidelines](api_policy.md), which define what Stø treats as a
 backwards-compatible change.
 

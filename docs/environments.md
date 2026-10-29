@@ -30,9 +30,6 @@ Returns `204 No Content` when the service is available. Used for the
     The healthcheck is intended for periodic peer-to-peer connectivity checking, not for
     high-frequency probing.
 
-A deprecated variant at `/gtotx/api/iso/healthcheck` returns `200 OK` with a `text/html` body. Do not
-use it in new integrations.
-
 ### ISO 8583 messages
 
 ```

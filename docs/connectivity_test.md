@@ -8,7 +8,9 @@ Perform the test in each [environment](environments.md) separately.
 
 ## Running the test
 
-Send a request to the healthcheck endpoint for the environment:
+Send a request to the healthcheck endpoint for the environment. The commands below are examples
+using `curl`; any HTTP client that supports mutual TLS will work. Replace `client.pem` and
+`client.key` with the paths to your own client certificate and private key.
 
 === "Preproduction"
 
@@ -22,8 +24,8 @@ Send a request to the healthcheck endpoint for the environment:
     curl -v --cert client.pem --key client.key https://tx.ctsp.stoe.no/gtotx/api/healthcheck
     ```
 
-A successful test returns `204 No Content`, and the verbose output shows the TLS handshake
-completing with your client certificate accepted.
+A successful test returns `204 No Content`, and the verbose output (`curl -v`) shows the TLS
+handshake completing with your client certificate accepted.
 
 !!! warning "Do not poll more than once per minute"
 
@@ -35,69 +37,81 @@ completing with your client certificate accepted.
 |---------|--------------|
 | Connection times out | Source IP not allow-listed, or allow-listed for the other environment |
 | TLS handshake fails, server requests a certificate | Client certificate not presented, or presented for the wrong environment |
-| TLS handshake fails on certificate verification | Server certificate chain missing from your trust store — see below |
+| TLS handshake fails on certificate verification | DigiCert Global Root G2 missing from your trust store — see below |
 | Certificate expired | Client certificate past its validity; request renewal via a new CSR |
 
 ## Server certificate chains
 
-Your client must trust the STS server certificate. Both environments use certificates issued under
-the DigiCert Global Root G2 hierarchy, which most system trust stores already contain. If your client
-uses a restricted or pinned trust store, add the relevant chain below.
+Your client validates the STS server certificate by trusting its root certificate authority,
+**DigiCert Global Root G2**. Both environments use certificates issued under this root, which most
+system trust stores already contain. If your client uses a restricted trust store, add the DigiCert
+Global Root G2 certificate to it. Do not add the leaf or intermediate certificate as the trust
+anchor.
 
-!!! note "Certificates are rotated"
+!!! warning "Do not pin the leaf or intermediate certificate"
 
-    The leaf certificates below are reissued periodically and the copies here may lag behind. Fetch
-    the live chain rather than relying on this page:
+    The leaf certificates are reissued periodically, and the intermediate certificate may also
+    change. A client that pins either of them will lose connectivity when they are rotated. Trust the
+    root and rely on standard chain validation, including hostname verification.
 
-    ```bash
-    openssl s_client -showcerts -connect tx.ctsp.stoe.no:443 -servername tx.ctsp.stoe.no </dev/null
-    ```
+The chains below are for reference and troubleshooting only, and may lag behind the live
+certificates. You can inspect the chain currently served with any TLS tool available on your
+platform. For example, with `openssl`:
+
+```bash
+openssl s_client -showcerts -connect tx.ctsp.stoe.no:443 -servername tx.ctsp.stoe.no </dev/null
+```
+
+`openssl` may not be installed on every system, and the exact command depends on your environment.
+If your client connects through an outbound proxy, run the check from a host with the same network
+path. A TLS-inspecting proxy presents its own certificate chain instead of the STS chain, so the
+output will not match the chains below.
 
 ### Preproduction
 
-Leaf certificate `*.baxlab.no`, valid until **18 September 2026**.
+Leaf certificate `*.baxlab.no`, valid until **1 April 2027**.
 
 ??? abstract "Preproduction certificate chain (PEM)"
 
     ```
     -----BEGIN CERTIFICATE-----
-    MIIGxzCCBa+gAwIBAgIQDgSq++HIxE8+x+X4aEtC7jANBgkqhkiG9w0BAQsFADBZ
+    MIIGxDCCBaygAwIBAgIQAaD/9YdcTx4MuoMJrh39LjANBgkqhkiG9w0BAQsFADBZ
     MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMTMwMQYDVQQDEypE
-    aWdpQ2VydCBHbG9iYWwgRzIgVExTIFJTQSBTSEEyNTYgMjAyMCBDQTEwHhcNMjUw
-    ODE4MDAwMDAwWhcNMjYwOTE4MjM1OTU5WjBQMQswCQYDVQQGEwJOTzENMAsGA1UE
-    BxMET1NMTzEcMBoGA1UEChMTQkFOS0lEIEJBTktBWEVQVCBBUzEUMBIGA1UEAwwL
-    Ki5iYXhsYWIubm8wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDGiMjX
-    amqgRKTB198l4jfcAoDplV3FUNJpqfuV4lPS8YUXocxUIPzKXX8HyoDI1mFFuVYA
-    7nKgCiEfZvi8J/+4lLxVbDePz++sBV9Vbk0ldcpxR6sd5RCNJ8S9j4cLk6bIcTse
-    m2MniT4jQeX3A69ZRCe4UhCzKS/Rjjtd98Prlkjhiaq6ql/HUo5dBy56KWTzBxjM
-    brqVQJv5PHVSKElKa3rVG7oH8VnWpD3RLbdWHePyEkUMefu/nr+Oj6wTqgFKQKLf
-    BjaO3Y44UpwSXms1Xpq3LwINEYZzHsn3lOz/CUUlBsMC9NbqhHywhXRENIFD55Xe
-    lQoN5bbzI7Nz9HfvAgMBAAGjggOSMIIDjjAfBgNVHSMEGDAWgBR0hYDAZsffN97P
-    vSk3qgMdvu3NFzAdBgNVHQ4EFgQUD/7BNJSQNfoua+k08KFs2VEOTu8wIQYDVR0R
-    BBowGIILKi5iYXhsYWIubm+CCWJheGxhYi5ubzA+BgNVHSAENzA1MDMGBmeBDAEC
-    AjApMCcGCCsGAQUFBwIBFhtodHRwOi8vd3d3LmRpZ2ljZXJ0LmNvbS9DUFMwDgYD
-    VR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjCBnwYD
-    VR0fBIGXMIGUMEigRqBEhkJodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vRGlnaUNl
-    cnRHbG9iYWxHMlRMU1JTQVNIQTI1NjIwMjBDQTEtMS5jcmwwSKBGoESGQmh0dHA6
-    Ly9jcmw0LmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEdsb2JhbEcyVExTUlNBU0hBMjU2
-    MjAyMENBMS0xLmNybDCBhwYIKwYBBQUHAQEEezB5MCQGCCsGAQUFBzABhhhodHRw
-    Oi8vb2NzcC5kaWdpY2VydC5jb20wUQYIKwYBBQUHMAKGRWh0dHA6Ly9jYWNlcnRz
-    LmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEdsb2JhbEcyVExTUlNBU0hBMjU2MjAyMENB
-    MS0xLmNydDAMBgNVHRMBAf8EAjAAMIIBfgYKKwYBBAHWeQIEAgSCAW4EggFqAWgA
-    dgDXbX0Q0af1d8LH6V/XAL/5gskzWmXh0LMBcxfAyMVpdwAAAZi8+5pLAAAEAwBH
-    MEUCIQDfTm7rL5jViRpqQ21gjtMuJY8UGeaCUxjpGyHrEAjFeQIgAh1w/0LCuqKN
-    x+6Cn076b5Vhf6ZD6CJJqPS0XvJ/mIgAdwDCMX5XRRmjRe5/ON6ykEHrx8IhWiK/
-    f9W1rXaa2Q5SzQAAAZi8+5p5AAAEAwBIMEYCIQCD45ioz73HH2p6luXNMDwHpq4T
-    ctaQD/DFDKk0g9x3IQIhAI2iRJlGuwzqpSrP5tlY3HG2HvB1B6yV6vDnNDdMl+Cx
-    AHUAlE5Dh/rswe+B8xkkJqgYZQHH0184AgE/cmd9VTcuGdgAAAGYvPualAAABAMA
-    RjBEAiAV5/n2lVbdsyk27eGxikLsMvEWCScjRBNFAwUvU0go1wIgJDfL5ZyzI5wq
-    31TzLoMiyjgd2+Vy+P1sV9peHXVDnOEwDQYJKoZIhvcNAQELBQADggEBAJ4UIRO3
-    AaDp6o4qz7vI9YnGomr3mKtFXhlQYpVjbj67ry6qaphFRaPrcLRdSfufc4hYEXqH
-    zCYBWAMgZsPU/NPRZoPn5IR0vDwjFwtsoM35xWvjYUSgUkJKyrj2L1e8pzTEDMo7
-    vyZcRrmrkk4X8CahPR0UkYkokz99nQmxXFTWDmbN6xLBgVxu/Eyb40YVmUlgecFm
-    RB/fVUOGfQYe/8E/FoDNkL880vUzKlMJF3+w2x2b2Q2dJ4QK+gpiPDs6RmZHFDsF
-    tsaB30YoEXi7d6f1aUxRHZRC2R1eP6Y5+xKL1hY8KcuXpm5qxNBR5ApKjEBLc6Ss
-    bMtiWEK8yit6ykA=
+    aWdpQ2VydCBHbG9iYWwgRzIgVExTIFJTQSBTSEEyNTYgMjAyMCBDQTEwHhcNMjYw
+    OTE1MDAwMDAwWhcNMjcwNDAxMjM1OTU5WjBEMQswCQYDVQQGEwJOTzENMAsGA1UE
+    BxMET3NsbzEQMA4GA1UECgwHU1TDmCBBUzEUMBIGA1UEAwwLKi5iYXhsYWIubm8w
+    ggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDD/Vkhim8jNCbMyoLUsUQk
+    JpJy0Sp9FsBkaKSin7neFTcfW1B02As6HvOtZ1YH7IJ63vPOEKTiop81GirhIClX
+    No61uL2sPgjvISPMICb7NjKwr5/XqX32BbMWwBDAdYgGS3OGCfRpXAQOT4u1AVt3
+    7Q5j8r6jLPPSd+6j1sIowESMtL8ndZjHKpI0Rq/VUPpQeBFAt6F2vYwv31Bn+EzG
+    WawcoUyv7QR4AfrPEh0p02ldtVjMXPFWP+zWxe1PnGIorjKAt0A8EZjXm2GDrIdf
+    yrGW9M7KTCPKxmHNAnAtitqbDwEmDfiug0zNRxoiDKelFimIeCkqkSpbtoP4dn63
+    AgMBAAGjggObMIIDlzAfBgNVHSMEGDAWgBR0hYDAZsffN97PvSk3qgMdvu3NFzAd
+    BgNVHQ4EFgQUnwFcCKH7dtlyUDD2L6xftyOg08EwIQYDVR0RBBowGIILKi5iYXhs
+    YWIubm+CCWJheGxhYi5ubzA+BgNVHSAENzA1MDMGBmeBDAECAjApMCcGCCsGAQUF
+    BwIBFhtodHRwOi8vd3d3LmRpZ2ljZXJ0LmNvbS9DUFMwDgYDVR0PAQH/BAQDAgWg
+    MB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjCBnwYDVR0fBIGXMIGUMEig
+    RqBEhkJodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vRGlnaUNlcnRHbG9iYWxHMlRM
+    U1JTQVNIQTI1NjIwMjBDQTEtMS5jcmwwSKBGoESGQmh0dHA6Ly9jcmw0LmRpZ2lj
+    ZXJ0LmNvbS9EaWdpQ2VydEdsb2JhbEcyVExTUlNBU0hBMjU2MjAyMENBMS0xLmNy
+    bDCBhwYIKwYBBQUHAQEEezB5MCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdp
+    Y2VydC5jb20wUQYIKwYBBQUHMAKGRWh0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNv
+    bS9EaWdpQ2VydEdsb2JhbEcyVExTUlNBU0hBMjU2MjAyMENBMS0xLmNydDAMBgNV
+    HRMBAf8EAjAAMIIBhwYKKwYBBAHWeQIEAgSCAXcEggFzAXEAdwBMY9yY5Zwdq4j2
+    Hoo93q6Pq0SjN3tfm5TD+6Gc/MG+JgAAAaCkmQecAAAEAwBIMEYCIQCGLjKwGK37
+    oNwzh042nc5VmncGZuh4gea/dcochxggzQIhAJJhhZfa9A+p1NZ6GFq+mRgXUwQ2
+    2sk0dWhzBKATz5YpAHYA1tWNqdAXU/NqSqDHV0kCr+vH3CzTjNn3ZMgMiRkenwIA
+    AAGgpJkIUwAABAMARzBFAiEAps0zHjHxcPUqsnSbeabXs2e+OGQx2sBnFNOJiNpA
+    CHQCIGwQVcD14CSK1MZOl2bBMEeqATaz8TEcXzuxDMU9OTeMAH4AooEAGHNOF24d
+    R+CVQPOBulRml81jqENQcW64CU7a8Q0AAAGgpJkIKAAIAAAFAA18tRwEAwBHMEUC
+    IQD52kuAYUh1+jUL2R10+R/ysJw4nkWkhcnuRvq/SbJz9QIgPf9t8kWLRhmpc3lb
+    3v++OO4LyWbsIbwLweImoFOT+RQwDQYJKoZIhvcNAQELBQADggEBALf9NsaFh2Jm
+    mWNHdrJkXW+BNkkijUhUnXh5Z8ohvItuizG6c2fgXJ1Y/0LPW52JSICgvZw1aNDS
+    koHe4ltitI57rOXN0198y+bdESaRNVY6E0c7wDL2Q+5MrCGGxB5STq73gRZGaQNH
+    BjSVJ7SmJza246KE5IA1EwJplzbNNJhC889R4qDAOWom27m2gWjirneenWLRVT3B
+    yYplPyFlySSbeV7S0w4W709NoS4gHYQl9x8Fq7p/MMPucrEzZzImo/mMc3YThoMP
+    UdbKkwPOVrpKVhLq14D8NK5Hpoh90BAT0iQ/JrNx8Bm72u3mfFPwxX/vhk2jk+qL
+    mMLVjegkA1U=
     -----END CERTIFICATE-----
 
     -----BEGIN CERTIFICATE-----

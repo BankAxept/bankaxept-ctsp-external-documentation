@@ -23,7 +23,7 @@ nav:
       - Connectivity test: connectivity_test.md
       - Key exchange: zmk_exchange.md
   - ISO 8583 API:
-      - Message reference: TSP_ISO_Message_V2.9.md
+      - Message reference: TSP_ISO_Message.md
       - Message authentication (MAC): macusage.md
       - Worked MAC example: mac_create.md
   - JSON API:

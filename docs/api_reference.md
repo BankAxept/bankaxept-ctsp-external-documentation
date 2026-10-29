@@ -1,6 +1,6 @@
 # API reference
 
-The JSON API is a fully-supported alternative to the [ISO 8583 API](TSP_ISO_Message_V2.9.md): both
+The JSON API is an alternative to the [ISO 8583 API](TSP_ISO_Message.md): both
 front the same underlying tokenization service and the same input data, so behaviour, validation
 rules and data element meaning are shared between them. See
 [Choosing an interface](choosing_an_interface.md) for how the two compare, and

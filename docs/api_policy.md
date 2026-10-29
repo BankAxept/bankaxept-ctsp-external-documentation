@@ -1,4 +1,4 @@
-# API Design guidlines
+# API design guidelines
 
 ## Time
 All API elements must specify time using UTC.

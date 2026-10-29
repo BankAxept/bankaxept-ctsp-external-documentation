@@ -1,0 +1,205 @@
+/* ─────────────────────────────────────────────────────────
+   Stø Design System — MkDocs Material theme
+   Maps Stø brand tokens onto Material's CSS variable API.
+   Source: https://claude.ai/design/p/60a0b6ac-202c-4902-abaf-3f701550f24b
+   ───────────────────────────────────────────────────────── */
+
+/* Inter — workhorse UI/body font */
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..700;1,14..32,400..600&display=swap");
+
+/* PP Eiko — brand display face, reserved for the site title */
+@font-face {
+  font-family: "PP Eiko";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("../fonts/PPEiko-Medium.woff2") format("woff2"),
+       url("../fonts/PPEiko-Medium.woff") format("woff");
+}
+
+:root {
+  /* ---- Stø brand primitives ---- */
+  --sto-green-signal: #67e702;
+  --sto-green-light:  #c9fb88;
+  --sto-green-dark:   #093d05;
+  --sto-green-racing: #315e04;
+  --sto-green-section: #f2fae2;
+  --sto-beige-150:    #faf7f4;
+  --sto-warm-150:     #f8f7f5;
+  --sto-warm-300:     #eeece9;
+  --sto-neutral-900:  #121a12;
+  --sto-neutral-750:  #1d211d;
+  --sto-neutral-550:  #4d514c;
+  --sto-neutral-250:  #b9beb9;
+  --sto-blue-info:    #0049cf;
+  --sto-red-danger:   #8b000f;
+  --sto-orange-warn:  #603000;
+
+  --sto-radius-sm: 4px;
+  --sto-radius-md: 8px;
+  --sto-radius-lg: 12px;
+
+  --md-text-font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --md-code-font: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+/* ---- Light scheme ---- */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color:        var(--sto-green-dark);
+  --md-primary-fg-color--light: var(--sto-green-racing);
+  --md-primary-fg-color--dark:  var(--sto-neutral-900);
+  --md-primary-bg-color:        var(--sto-green-light);
+  --md-primary-bg-color--light: var(--sto-green-light);
+
+  --md-accent-fg-color:            var(--sto-green-racing);
+  --md-accent-fg-color--transparent: rgba(103, 231, 2, 0.15);
+  --md-accent-bg-color:            var(--sto-neutral-900);
+
+  --md-default-fg-color:          var(--sto-neutral-900);
+  --md-default-fg-color--light:   var(--sto-neutral-550);
+  --md-default-fg-color--lighter: #7b7f7a;
+  --md-default-fg-color--lightest: var(--sto-neutral-250);
+  --md-default-bg-color:          #ffffff;
+  --md-default-bg-color--light:   var(--sto-beige-150);
+
+  --md-typeset-color: var(--sto-neutral-900);
+  --md-typeset-a-color: var(--sto-green-racing);
+  --md-typeset-mark-color: rgba(103, 231, 2, 0.35);
+
+  --md-code-fg-color: var(--sto-neutral-900);
+  --md-code-bg-color: var(--sto-warm-150);
+
+  --md-admonition-fg-color: var(--sto-neutral-900);
+  --md-admonition-bg-color: #ffffff;
+
+  --md-footer-fg-color:         #ffffff;
+  --md-footer-fg-color--light:  var(--sto-green-light);
+  --md-footer-bg-color:         var(--sto-green-dark);
+  --md-footer-bg-color--dark:   var(--sto-neutral-900);
+}
+
+/* ---- Dark scheme ---- */
+[data-md-color-scheme="slate"] {
+  --md-hue: 120;
+
+  --md-primary-fg-color:        var(--sto-neutral-750);
+  --md-primary-fg-color--light: var(--sto-green-racing);
+  --md-primary-fg-color--dark:  var(--sto-neutral-900);
+  --md-primary-bg-color:        var(--sto-green-light);
+
+  --md-accent-fg-color:            var(--sto-green-signal);
+  --md-accent-fg-color--transparent: rgba(103, 231, 2, 0.15);
+  --md-accent-bg-color:            var(--sto-neutral-900);
+
+  --md-default-fg-color:          #eef2ee;
+  --md-default-fg-color--light:   #b9beb9;
+  --md-default-bg-color:          var(--sto-neutral-900);
+  --md-default-bg-color--light:   #171f17;
+  --md-default-bg-color--lighter: #1d251d;
+
+  --md-typeset-color: #eef2ee;
+  --md-typeset-a-color: var(--sto-green-light);
+
+  --md-code-fg-color: #eef2ee;
+  --md-code-bg-color: #182018;
+
+  --md-footer-fg-color:  #ffffff;
+  --md-footer-bg-color:  var(--sto-neutral-750);
+}
+
+/* ---- Logo: same mark, inverted to white on dark surfaces (per Stø brand guideline) ---- */
+[data-md-color-scheme="slate"] .md-header__button.md-logo img,
+[data-md-color-scheme="slate"] .md-header__button.md-logo svg {
+  filter: brightness(0) invert(1);
+}
+
+/* ---- Brand display face for the site title only ---- */
+.md-header__topic:first-child .md-ellipsis,
+.md-nav__title .md-nav__button ~ span:first-of-type {
+  font-family: "PP Eiko", Georgia, serif;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+/* ---- Headings use the medium weight from the type scale ---- */
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4 {
+  font-weight: 500;
+  letter-spacing: normal;
+}
+.md-typeset h1 { color: var(--md-default-fg-color); }
+
+/* ---- Rounded, tonal buttons ---- */
+.md-typeset .md-button {
+  border-radius: var(--sto-radius-md);
+  border-color: var(--sto-green-dark);
+  color: var(--sto-green-dark);
+  text-transform: none;
+  font-weight: 500;
+}
+.md-typeset .md-button:hover,
+.md-typeset .md-button:focus {
+  background-color: var(--sto-green-signal);
+  border-color: var(--sto-green-signal);
+  color: var(--sto-green-dark);
+}
+.md-typeset .md-button--primary {
+  background-color: var(--sto-green-signal);
+  border-color: var(--sto-green-signal);
+  color: var(--sto-green-dark);
+}
+.md-typeset .md-button--primary:hover,
+.md-typeset .md-button--primary:focus {
+  background-color: var(--sto-green-light);
+  border-color: var(--sto-green-light);
+  color: var(--sto-green-dark);
+}
+
+/* ---- Softer corners on cards, code and callouts ---- */
+.md-typeset pre > code,
+.md-typeset .highlight,
+.md-typeset code {
+  border-radius: var(--sto-radius-sm);
+}
+.md-typeset table:not([class]) {
+  border-radius: var(--sto-radius-md);
+  overflow: hidden;
+}
+.md-typeset .admonition,
+.md-typeset details {
+  border-radius: var(--sto-radius-md);
+  border-width: 0;
+  border-left: 4px solid var(--sto-green-racing);
+}
+.md-typeset .admonition.warning,
+.md-typeset details.warning {
+  border-left-color: var(--sto-orange-warn);
+}
+.md-typeset .admonition.danger,
+.md-typeset details.danger {
+  border-left-color: var(--sto-red-danger);
+}
+
+/* ---- Search highlight in brand green ---- */
+.md-search-result__link[data-md-state="active"],
+.md-search-result__link:hover {
+  background-color: var(--sto-green-section);
+}
+[data-md-color-scheme="slate"] .md-search-result__link[data-md-state="active"],
+[data-md-color-scheme="slate"] .md-search-result__link:hover {
+  background-color: var(--sto-neutral-750);
+}
+
+/* ---- Active nav item ---- */
+.md-nav__link--active,
+.md-nav__link:focus,
+.md-nav__link:hover {
+  color: var(--sto-green-racing);
+}
+[data-md-color-scheme="slate"] .md-nav__link--active,
+[data-md-color-scheme="slate"] .md-nav__link:focus,
+[data-md-color-scheme="slate"] .md-nav__link:hover {
+  color: var(--sto-green-light);
+}

@@ -1,4 +1,4 @@
-# Thales - ISO 8583 Interface with Cloud TSP
+# Thales - ISO 8583 Interface with Stø Token Service
 
 Confidential information of Thales
 NO WARRANTIES OF ANY NATURE ARE EXTENDED BY THIS DOCUMENT. Any product and related material
@@ -19,7 +19,7 @@ Copyright © 202 1 Thales .
   - [Scope](#11-scope)
   - [Audience](#12-audience)
   - [Reference documents](#13-reference-documents)
-- [Communication channel between a remote host and the Cloud TSP](#2-communication-channel-between-a-remote-host-and-the-cloud-tsp)
+- [Communication channel between a remote host and the Stø Token Service](#2-communication-channel-between-a-remote-host-and-the-cloud-tsp)
 - [Structure and Content of Messages](#3-structure-and-content-of-messages)
   - [Overview of the message structure](#31-overview-of-the-message-structure)
   - [Header](#32-header)
@@ -28,20 +28,20 @@ Copyright © 202 1 Thales .
   - [Data Elements Fields attributes](#35-data-elements-fields-attributes)
   - [Data Elements Coding](#36-data-elements-coding)
 - [List of ISO messages supported](#4-list-of-iso-messages-supported)
-  - [1100 – Detokenization request to the Cloud TSP](#41-1100--detokenization-request-to-the-cloud-tsp)
-  - [1110 - Detokenization request response from the Cloud TSP](#42-1110---detokenization-request-response-from-the-cloud-tsp)
-  - [1120 - Transaction Advice communication to the Cloud TSP (re-tokenization)](#43-1120---transaction-advice-communication-to-the-cloud-tsp-re-)
-  - [1130 - Transaction Advice communication response from the Cloud TSP (re-tokenization)](#44-1130--transaction-advice-communication-response-from-the-cloud-tsp-re-tokenization)
+  - [1100 – Detokenization request to the Stø Token Service](#41-1100--detokenization-request-to-the-cloud-tsp)
+  - [1110 - Detokenization request response from the Stø Token Service](#42-1110---detokenization-request-response-from-the-cloud-tsp)
+  - [1120 - Transaction Advice communication to the Stø Token Service (re-tokenization)](#43-1120---transaction-advice-communication-to-the-cloud-tsp-re-)
+  - [1130 - Transaction Advice communication response from the Stø Token Service (re-tokenization)](#44-1130--transaction-advice-communication-response-from-the-cloud-tsp-re-tokenization)
   - [List of data elements in ISO messages](#5-list-of-data-elements-in-iso-messages)
 - [Requests validation by TSP](#6-requests-validation-by-tsp)
   - [TSP Database](#61-tsp-database) 
-    - [1100 - Detokenization request to the Cloud TSP](#611-1100--detokenization-request-to-the-cloud-tsp)
-    - [1120 - Transaction Advice communication to the Cloud TSP (re-tokenization)](#612-1120---transaction-advice-communication-to-the-cloud-tsp-re-tokenization)
-  - [Verification of 1100 - Detokenization request to the Cloud TSP](#62-verification-on-1100-detokenization-request-to-the-cloud-tsp)
+    - [1100 - Detokenization request to the Stø Token Service](#611-1100--detokenization-request-to-the-cloud-tsp)
+    - [1120 - Transaction Advice communication to the Stø Token Service (re-tokenization)](#612-1120---transaction-advice-communication-to-the-cloud-tsp-re-tokenization)
+  - [Verification of 1100 - Detokenization request to the Stø Token Service](#62-verification-on-1100-detokenization-request-to-the-cloud-tsp)
     - [HCE verification flow](#621-hce-verification-flow)
     - [Secure Element verification flow](#622-secure-element-based-verification-flow)
     - [In-app payment cloud cryptogram verification flow](#623-in-app-payment-cloud-cryptogram-verification-flow)
-  - [Verification of 1120 - Transaction Advice communication to the Cloud TSP (re-tokenization)](#63-verification-on-1120---transaction-advice-communication-to-the-cloud-tsp-re-tokenization)
+  - [Verification of 1120 - Transaction Advice communication to the Stø Token Service (re-tokenization)](#63-verification-on-1120---transaction-advice-communication-to-the-cloud-tsp-re-tokenization)
 - [Message Data Elements Description](#7-message-data-elements-description)
 - [Appendix](#8-appendix)
   - [Token Assurance Method codification](#81-token-assurance-method-codification)
@@ -93,20 +93,20 @@ The Cloud Token Service Provider is a payment tokenization service providing EMV
 
 ## 1.1 Scope
 
-The present document describes the format of messages exchanged between Cloud TSP and a remote Host (Acquirer server or Bank server).
+The present document describes the format of messages exchanged between Stø Token Service and a remote Host (Acquirer server or Bank server).
 
 ## 1.2 Audience
 
 The audience of this documents is:
 
-    * POS aggregators connecting to the detokenization interface of the Cloud TSP service
+    * POS aggregators connecting to the detokenization interface of the Stø Token Service service
     * Payment systems implementing tokenization
 
 ## 1.3 Reference documents
 
-    * BankAxept. Cloud TSP In-app payment cloud cryptogram.
+    * Stø. Stø Token Service In-app payment cloud cryptogram.
 
-# 2 Communication channel between a remote host and the Cloud TSP
+# 2 Communication channel between a remote host and the Stø Token Service
 
 The communication channel is specific to each project and must established a secure channel (see 8.3 Connectivity Requirements)
 
@@ -155,7 +155,7 @@ It has the following format:
 | 2 - 5    | **Request** <br> Release & version of the protocol. <br> 1000: version 1                                                                                                                                                                                                                                                          | 
 |          | **Response** <br> Value is echoed back in response.                                                                                                                                                                                                                                                                               |
 | 6 - 8    | **Request** <br> Always set to 000.                                                                                                                                                                                                                                                                                               |
-|          | **Response** <br> When Cloud TSP rejects a message for format error, this element contains the number of the first erroneous data element. Otherwise, this element contains: ‘000’.                                                                                                                                               |
+|          | **Response** <br> When Stø Token Service rejects a message for format error, this element contains the number of the first erroneous data element. Otherwise, this element contains: ‘000’.                                                                                                                                               |
 
 Table 2 – Message Header
 
@@ -164,14 +164,14 @@ Table 2 – Message Header
 The message type is an element of 4 positions serving to identify the general function of the
 message. This element is mandatory in all the messages.
 
-The following messages are exchanged between Cloud TSP and the remote Host:
+The following messages are exchanged between Stø Token Service and the remote Host:
 
 | Message | Description                                                                     |
 |---------|---------------------------------------------------------------------------------|
-| 1100    | Detokenization request to the Cloud TSP.                                        |
-| 1110    | Detokenization request response from the Cloud TSP.                             |
-| 1120    | Transaction Advice communication to the Cloud TSP (re-tokenization).            |
-| 1130    | Transaction Advice communication response from the Cloud TSP (re-tokenization). |
+| 1100    | Detokenization request to the Stø Token Service.                                        |
+| 1110    | Detokenization request response from the Stø Token Service.                             |
+| 1120    | Transaction Advice communication to the Stø Token Service (re-tokenization).            |
+| 1130    | Transaction Advice communication response from the Stø Token Service (re-tokenization). |
 
 Table 3 – List of ISO messages supported
 
@@ -183,7 +183,7 @@ element is present, while ‘0’ indicates the element is absent)_. The bytes i
 from left to right.
 
 The message may support several bitmaps each one has 8 bytes length (64-bit string contained within
-an eight-byte data element), can be used in the messages exchanged with Cloud TSP.
+an eight-byte data element), can be used in the messages exchanged with Stø Token Service.
 
 * A primary bitmap indicates the presence of fields from 1 to 64.
 * A secondary bitmap indicates the presence of fields from 65 to 128.
@@ -326,19 +326,19 @@ Example:
 
 # 4 List of ISO messages supported
 
-## 4.1 1100 – Detokenization request to the Cloud TSP
+## 4.1 1100 – Detokenization request to the Stø Token Service
 
-The remote Host is using this message for requesting the Cloud TSP to detokenize a message.
-During the message processing, the Cloud TSP is processing:
+The remote Host is using this message for requesting the Stø Token Service to detokenize a message.
+During the message processing, the Stø Token Service is processing:
 
 * Token domain restriction Controls checks based on the type of token
 * Detokenization
 
 Note: This message corresponds to the “Token Authorization Request” message in the ‘EMV Payment Tokenisation Specification Technical Framework v2.0”.
 
-## 4.2 1110 - Detokenization request response from the Cloud TSP
+## 4.2 1110 - Detokenization request response from the Stø Token Service
 
-The Cloud TSP uses this message for communicating the result of the detokenization request
+The Stø Token Service uses this message for communicating the result of the detokenization request
 message.
 
 It may be either
@@ -350,11 +350,11 @@ It may be either
 Note: This message corresponds to the “PAN Authorization Request” message in the ‘EMV Payment
 Tokenisation Specification Technical Framework v2.0”.
 
-## 4.3 1120 - Transaction Advice communication to the Cloud TSP (re-
+## 4.3 1120 - Transaction Advice communication to the Stø Token Service (re-
 tokenization)
 
 The remote Host is using this message, for communicating the result of the transaction processing to
-the Cloud TSP and to request the Cloud TSP to retokenize a message.
+the Stø Token Service and to request the Stø Token Service to retokenize a message.
 
 The result of transaction processing may be either
 
@@ -362,7 +362,7 @@ The result of transaction processing may be either
 * ‘transaction declined’
 *  or transaction previously approved is reversed’.
 
-During the message processing, the Cloud TSP is processing:
+During the message processing, the Stø Token Service is processing:
 
 * Check related to the PAN value communicated
 * Send notification message to the wallet
@@ -372,9 +372,9 @@ During the message processing, the Cloud TSP is processing:
 Note: This message corresponds to the “PAN Authorization Response” message in the ‘EMV
 Payment Tokenisation Specification Technical Framework v2.0”.
 
-## 4.4 1130 -Transaction Advice communication response from the Cloud TSP (re-tokenization)
+## 4.4 1130 -Transaction Advice communication response from the Stø Token Service (re-tokenization)
 
-The Cloud TSP uses this message for communicating the result of the Transaction Advice
+The Stø Token Service uses this message for communicating the result of the Transaction Advice
 communication request message.
 
 It may be either
@@ -401,7 +401,7 @@ Payment Tokenisation Specification Technical Framework v2.0”.
 | 35    | Track2 Data <br/> PAN value is a Token value and CVV based on token value <br/> PAN value is accurate PAN value and CVV based on PAN value | <br/><br/>O | <br/><br/>C3 | C4   | -       |
 |       |                                                                                                                                            |             | C3           | C4   | .       |
 | 37    | Retrieval reference number                                                                                                                 | M           | C8           | M    | C8      |
-| 39    | Action/Response Code <br> Cloud TSP message processing result                                                                              | -           | M            |      | M       |
+| 39    | Action/Response Code <br> Stø Token Service message processing result                                                                              | -           | M            |      | M       |
 |       | Issuer Authorization Response Code                                                                                                         |             |              | M    |         |
 | 42    | Card Acceptor Identification Code                                                                                                          | M*          | -            | M*   | -       |
 | 43    | Card Acceptor Name and Address                                                                                                             | M           | -            | M    | -       |
@@ -415,7 +415,7 @@ Table 4 – Fields presence in ISO messages
 
 | Code | Description                                                                                                                                                                                                                                                           |
 |------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| C1   | Present only when the Cloud TSP has processed the message request without error.                                                                                                                                                                                      |
+| C1   | Present only when the Stø Token Service has processed the message request without error.                                                                                                                                                                                      |
 | C2   | Required when the transaction is performed using a chip payment application \[Field 22 position 1 equals to 05, 07 or 08\] except for “Type 2” transactions described in section 6.1.1 \(for these types of transaction, the presence of field 55 is optional\).      |
 | C3   | Present when Track2 Data is present in 1100 message. The value returned is using a PAN value that is either the echo of the PAN value present in the request message or the PAN value result of the detokenization \(For details, see 6 Requests validation by TSP\). |
 | C4   | This field must be set to the value of the equivalent parameter present in the de-tokenization response \(1110\) message.                                                                                                                                             |
@@ -444,7 +444,7 @@ value present in the origin transaction.
 
 The type of “database” used by the TSP is depending on the type of request message.
 
-### 6.1.1 1100 – Detokenization request to the Cloud TSP
+### 6.1.1 1100 – Detokenization request to the Stø Token Service
 
 The TSP is capable to process two types of de-tokenization request:
 
@@ -468,13 +468,13 @@ when the transaction is a chip transaction.
 Note 2: 1100 is optional for these use cases. The 1120 message (Advise) can be sent without 1100 if detokenization,
 meaning PAN knowledge, is not required.
 
-### 6.1.2 1120 - Transaction Advice communication to the Cloud TSP (re-tokenization)
+### 6.1.2 1120 - Transaction Advice communication to the Stø Token Service (re-tokenization)
 
 The TSP looks up a detokenization request in TSP Transaction History File by using TDT+RRN value as transaction ID. The
 token tied to the transaction ID is used to look up PAN in token vault. TSP checks PAN in token vault matches PAN in
 1120 – Advice Message else an error is returned in Advice response
 
-## 6.2 Verification on 1100 –Detokenization request to the Cloud TSP
+## 6.2 Verification on 1100 –Detokenization request to the Stø Token Service
 
 ### 6.2.1 HCE verification flow
 
@@ -546,7 +546,7 @@ This behavior (option 1 or option 2) is configurable per customer (domestic sche
 
 ### 6.2.3 In-app payment cloud cryptogram verification flow
 
-The in-app payment cloud cryptograms is a functionality provided by Cloud TSP for PSD2 compliance. The overview of the
+The in-app payment cloud cryptograms is a functionality provided by Stø Token Service for PSD2 compliance. The overview of the
 functionality and format of the cryptograms is described in (1).
 
 This flow is enabled by a configuration per customer. For customers in which enabled, the identification of the
@@ -585,7 +585,7 @@ applicability of the flow is performed by Field 22, Sub-field 1 PAN Entry Mode b
 
 This behavior (option 1 or option 2) is configurable per customer (domestic scheme or any closed loop environment)
 
-## 6.3 Verification on 1120 - Transaction Advice communication to the Cloud TSP (re-tokenization)
+## 6.3 Verification on 1120 - Transaction Advice communication to the Stø Token Service (re-tokenization)
 
 |         | TSP Check                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Notification sent | Field (02,14,35) | Field 39 value |
 |---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|------------------|----------------|
@@ -618,7 +618,7 @@ This behavior (option 1 or option 2) is configurable per customer (domestic sche
 
 # 7 Message Data Elements Description
 
-This section provides detailed descriptions of all data elements used by Cloud TSP / Remote Host
+This section provides detailed descriptions of all data elements used by Stø Token Service / Remote Host
 Interface messages.
 
 ## 7.1 Field n° 02 – Primary Account Number
@@ -626,7 +626,7 @@ Interface messages.
 |                 |                                                                                                                                                                                                                                  |
 |-----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Attribute**   | LLVAR; n... 19                                                                                                                                                                                                                   |
-| **Description** | The primary account number is a number used to identify a customer account. It may be either the PAN value associated to the card issued by the Issuer or the token value generated by the Cloud TSP during card digitalisation. |
+| **Description** | The primary account number is a number used to identify a customer account. It may be either the PAN value associated to the card issued by the Issuer or the token value generated by the Stø Token Service during card digitalisation. |
 
 ## Field n° 03 – Processing Code
 
@@ -655,7 +655,7 @@ Interface messages.
 |                 |                                                                                                                                                                                                               |
 |-----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Attribute**   | n-4                                                                                                                                                                                                           |
-| **Description** | The expiration date of the payment product. It may be either the expiration date of the card issued by the Issuer or the expiration date of the token generated by  the Cloud TSP during card digitalisation. |
+| **Description** | The expiration date of the payment product. It may be either the expiration date of the card issued by the Issuer or the expiration date of the token generated by  the Stø Token Service during card digitalisation. |
 
 ## Field n° 18 – Merchant Type
 
@@ -691,14 +691,14 @@ Interface messages.
 |                 |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 |-----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Attribute**   | LLVAR ans... 37                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| **Description** | Track 2 data compliant with ISO 7813, excluding the start and end sentinels and the LRC. The PAN value in Track2 Data is either the PAN value associated to the card issued by the Issuer or the token value generated by the Cloud TSP during card digitalisation. <br/> For chip transactions, DE 35 carries data read from the chip as EMV tag 57 (Track 2 Equivalent Data). The account number in DE 2 (Primary Account  Number [PAN]) must match the account number in DE 35. |
+| **Description** | Track 2 data compliant with ISO 7813, excluding the start and end sentinels and the LRC. The PAN value in Track2 Data is either the PAN value associated to the card issued by the Issuer or the token value generated by the Stø Token Service during card digitalisation. <br/> For chip transactions, DE 35 carries data read from the chip as EMV tag 57 (Track 2 Equivalent Data). The account number in DE 2 (Primary Account  Number [PAN]) must match the account number in DE 35. |
 
 ## Field n° 39 – Action/Response Code
 
 |                 |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 |-----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Attribute**   | n-3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| **Description** | The code value must be part of full successful/error code list below else an error is returned by TSP. <br/> TSP notifies TSH and therefore the wallet in case of failed payment only for error code listed below. Any other value included in Advise message does not trigger payment notification to TSH and wallet. <br/> <br/> a) In 1120 message not related to a reversal or refund message. <br/> When the message 1120 message is processed without any error: <br/> If 1120 field 39 is 000: <br/> - A notification is sent to the TSH with transaction result APPROVED. <br/> - 1130 response code will be 000 if no further error is found by processing the request <br/> If 1120 field 39 is one of the list above except 000: <br/> - A notification is sent to the TSH with transaction result DECLINED. <br/> - 1130 response code will be 000 if no further error is found by processing the request <br/> If 1120 field 39 was NOT one of the list above: <br/> - No notification is sent to the TSH <br/> - 1130 response code will be 006. Header field in HTTP header will state field number 039 if this inconsistency on field 39 if the first one experienced by TSP during ISO message validation (see 3.2) <br/> When the message 1120 message is processed with error: <br/> - No notification is sent to the TSH <br/> - 1130 response code will be set to the value associated to the error <br/> <br/> b) In 1120 message related to a reversal message (Processing Code (field 03) position 1-2 is equal to ’22- reversal’ and Response Code (field 39)=000 <br/> When the message 1120 message is processed without any error: <br/> - A notification is sent to the TSH with transactionType= PURCHASE, and transactionResult = REFUNDED. <br/> - 1130 response code will be 000 <br/> When the message 1120 message is processed with error: <br/> - No notification is sent to the TSH <br/> - 1130 response code will be set to the value associated to the error <br/> <br/> c) In 1120 message related to a refund message (Processing Code (field 03) position 1-2 is equal to ’20- refund’ and Response Code (field 39)=000 ) <br/> When the message 1120 message is processed without any error: <br/> - A notification is sent to the TSH with transactionType = REFUND transactionResult = APPROVED. <br/> - 1130 response code will be 000 <br/> <br/> When the message 1120 message is processed with error: <br/> - No notification is sent to the TSH <br/> - 1130 response code will be set to the value associated to the error <br/> <br/> e) In 1120 message related to a refund message (Processing Code (field 03) position 1-2 is equal to ’52- Credit – Return of goods and Response Code (field 39)=000 ) <br/> <br/> When the message 1120 message is processed without any error: <br/> - A notification is sent to the TSH with transactionType = PURCHASE transactionResult = REFUNDED. <br/> - 1130 response code will be 000 <br/> <br/> When the message 1120 message is processed with error: <br/> ssed with error: <br/> - 1130 response code will be set to the value associated to the error <br/> <br/> e) In 1110 message and 1130 message, it corresponds to Cloud TSP message processing result |
+| **Description** | The code value must be part of full successful/error code list below else an error is returned by TSP. <br/> TSP notifies TSH and therefore the wallet in case of failed payment only for error code listed below. Any other value included in Advise message does not trigger payment notification to TSH and wallet. <br/> <br/> a) In 1120 message not related to a reversal or refund message. <br/> When the message 1120 message is processed without any error: <br/> If 1120 field 39 is 000: <br/> - A notification is sent to the TSH with transaction result APPROVED. <br/> - 1130 response code will be 000 if no further error is found by processing the request <br/> If 1120 field 39 is one of the list above except 000: <br/> - A notification is sent to the TSH with transaction result DECLINED. <br/> - 1130 response code will be 000 if no further error is found by processing the request <br/> If 1120 field 39 was NOT one of the list above: <br/> - No notification is sent to the TSH <br/> - 1130 response code will be 006. Header field in HTTP header will state field number 039 if this inconsistency on field 39 if the first one experienced by TSP during ISO message validation (see 3.2) <br/> When the message 1120 message is processed with error: <br/> - No notification is sent to the TSH <br/> - 1130 response code will be set to the value associated to the error <br/> <br/> b) In 1120 message related to a reversal message (Processing Code (field 03) position 1-2 is equal to ’22- reversal’ and Response Code (field 39)=000 <br/> When the message 1120 message is processed without any error: <br/> - A notification is sent to the TSH with transactionType= PURCHASE, and transactionResult = REFUNDED. <br/> - 1130 response code will be 000 <br/> When the message 1120 message is processed with error: <br/> - No notification is sent to the TSH <br/> - 1130 response code will be set to the value associated to the error <br/> <br/> c) In 1120 message related to a refund message (Processing Code (field 03) position 1-2 is equal to ’20- refund’ and Response Code (field 39)=000 ) <br/> When the message 1120 message is processed without any error: <br/> - A notification is sent to the TSH with transactionType = REFUND transactionResult = APPROVED. <br/> - 1130 response code will be 000 <br/> <br/> When the message 1120 message is processed with error: <br/> - No notification is sent to the TSH <br/> - 1130 response code will be set to the value associated to the error <br/> <br/> e) In 1120 message related to a refund message (Processing Code (field 03) position 1-2 is equal to ’52- Credit – Return of goods and Response Code (field 39)=000 ) <br/> <br/> When the message 1120 message is processed without any error: <br/> - A notification is sent to the TSH with transactionType = PURCHASE transactionResult = REFUNDED. <br/> - 1130 response code will be 000 <br/> <br/> When the message 1120 message is processed with error: <br/> ssed with error: <br/> - 1130 response code will be set to the value associated to the error <br/> <br/> e) In 1110 message and 1130 message, it corresponds to Stø Token Service message processing result |
 | **Values**      | <table><tr><th>Code</th><th>Description</th></tr><tr><td>'000'</td><td>Transaction or request approved</td></tr><tr><td>'001'</td><td>Expired card</td></tr><tr><td>‘002'</td><td>Bad Merchant</td></tr><tr><td>'003'</td><td>Unknown Card or wrong card status</td></tr><tr><td>'004'</td><td>Terminal Transaction not permitted</td></tr><tr><td>'005'</td><td>Cryptographic checks failure (wrong ARQC cryptogram)</td></tr><tr><td>'006'</td><td>Message Format error</td></tr><tr><td>'007'</td><td>Invalid amount</td></tr><tr><td>'008'</td><td>Insufficient funds/over credit limit (token domain control)</td></tr><tr><td>'009'</td><td>Duplicate transmission detected</td></tr><tr><td>'010'</td><td>System error</td></tr><tr><td>'011'</td><td>Lost card</td></tr><tr><td>'012'</td><td>Stolen card</td></tr><tr><td>'013'</td><td>Suspect fraud</td></tr><tr><td>'014'</td><td>Cryptographic Key not supported</td></tr><tr><td>'015'</td><td>Wrong Field 55 format</td></tr><tr><td>'016'</td><td>Cryptogram expired (specific to QR Code project)</td></tr><tr><td>'017'</td>Amount in the message field not within allowable limits derived from amount in field 55<td></td></tr><tr><td>'018'</td><td>Currency code in the message field does not match currency code in field 55</td></tr><tr><td>'019'</td><td>Local Verification Results check failed (Apple Pay)</td></tr><tr><td>'020'</td><td>Required CDCVM stamp is missing</td></tr><tr><td>'021'</td><td>CDCVM Stamp checking failure</td></tr><tr><td>'024'</td><td>RFU (Required Cloud PIN stamp is missing)</td></tr><tr><td>'025'</td><td>RFU (Cloud PIN stamp Stamp checking failure)</td></tr><tr><td>'029'</td><td>Cloud PIN not supported (Cloud PIN was used but it is not supported)</td></tr><tr><td>'030'</td><td>ATC Check failure</td></tr></table>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 
 ## Field n° 37 - Retrieval reference number
@@ -805,7 +805,7 @@ Attributes of the device that may be used to identify the specific device where 
 
 ## 8.3 Connectivity Requirements
 
-A secure channel must be established between the Cloud TSP and the remote Host (Acquirer server  or Bank server) as described below.
+A secure channel must be established between the Stø Token Service and the remote Host (Acquirer server  or Bank server) as described below.
 
 ### 8.3.1 VPN
 
@@ -824,11 +824,11 @@ The full ISO payload will be exchanged using HTTP Request/Response scheme:
   * content type: “x-www-form-urlencoded”
   * The full full byte array ISO message request is Base64 encoded and present in the Body Request
 * HTTP Response
-  * It contains the synchronous ISO message Response from Cloud TSP.
+  * It contains the synchronous ISO message Response from Stø Token Service.
   * The full byte array ISO message response is Base64 encoded in present in the Body Response.
   * HTTP Status code
-    * 200 if Cloud TSP decodes and parses the ISO message Request. Response will contain the ISO message Response
-    * 4xx if Cloud TSP fails to decode and parse ISO message. No ISO message will be present.
+    * 200 if Stø Token Service decodes and parses the ISO message Request. Response will contain the ISO message Response
+    * 4xx if Stø Token Service fails to decode and parse ISO message. No ISO message will be present.
     * 5xx connection error. No ISO message will be present.
 
 ### 8.3.3 MAC usage

@@ -4,7 +4,7 @@ info:
   description: >
     # Introduction
     
-    The API provies methods for detokenizing and sending notification
+    The API provides methods for detokenizing and sending notification
     
     # Security
     
@@ -22,7 +22,10 @@ info:
 
     * Thales, ISO 8583 Interface with Stø Token Service. The Stø Token Service detokenization API is an alternate interface to the ISO 8583 described in this document.  
       The ISO 8583 document contains more detailed description on the behaviour of the different operations.
-  version: "1.0-DRAFT_2022-08-31"
+  version: "1.0"
+servers:
+  - url: https://ctsp-proc-pp.baxlab.no/gtotx/api/v1.0/proc/
+    description: integration and qa environment.
 paths:
   /detokenize:
     post:
@@ -104,6 +107,15 @@ paths:
         204:
           description: Successful operation. The request was processed successfully.
       x-codegen-request-body-name: body
+  /healthcheck:
+    get:
+      description: This endpoint is used to check the readiness of the API.
+      tags:
+        - healthcheck
+      operationId: healthcheck
+      responses:
+        204:
+          description: Health check completed successfully.
 components:
   schemas:
     DetokenizationRequest:
@@ -155,6 +167,9 @@ components:
           type: string
           format: text
         cipheredDetokenizedCard:
+          description: >
+            Encrypted card data returned on successful detokenization. It may also be returned when a detokenization
+            checker fails if the issuer group's returnFPanOnError option is enabled.
           $ref: '#/components/schemas/CipheredDetokenizedCard'
     NotificationRequest:
       required:
@@ -459,7 +474,7 @@ components:
          * `021` – CDCVM Stamp checking failure 
          * `024` – RFU (Required Cloud PIN stamp is missing) 
          * `025` – RFU (Cloud PIN stamp Stamp checking failure) 
-         * `029` – Cloud PIN not supported (Cloud PIN was used
+         * `029` – Cloud PIN not supported (Cloud PIN was used)
          * `030` – ATC Check failure
       enum:
         - '000'
